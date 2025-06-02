@@ -20,10 +20,10 @@ Este proyecto consiste en un juego de aventuras donde el jugador debe explorar u
    00114825
 
 3. Camila Alessandra Menjívar Martínez  
-   00095825
+00095825
 
 4. Lizbeth Sofia Menjívar Castillo  
-   00074525
+00074525
 
 ## Instrucciones de Ejecución
 
