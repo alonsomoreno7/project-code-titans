@@ -13,17 +13,13 @@ Este proyecto consiste en un juego de aventuras donde el jugador debe explorar u
 
 ### Integrantes del equipo
 
-1. Fernando Alonso Moreno Flores
-   00000125 
+1. Fernando Alonso Moreno Flores 00000125 
 
-2. Marcos Noe Vásquez Guardado 
-   00114825
+2. Marcos Noe Vásquez Guardado 00114825
 
-3. Camila Alessandra Menjívar Martínez  
-00095825
+3. Camila Alessandra Menjívar Martínez  00095825
 
-4. Lizbeth Sofia Menjívar Castillo  
-00074525
+4. Lizbeth Sofia Menjívar Castillo  00074525
 
 ## Instrucciones de Ejecución
 
