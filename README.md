@@ -1,11 +1,68 @@
 # Proyecto de Code Titans C++ - casino virtual
 
-## Descripción del Proyecto
+• Nombre del juego
+Casino Virtual: Consola Edición
 
-El jugador entra a un casino virtual, donde puede apostar una cantidad de dinero en distintos juegos de azar. Todo se maneja desde la consola: se muestran menús, se ingresan opciones y se actualizan las ganancias o pérdidas en tiempo real.
+• Temática y ambientación
+El juego simula un casino digital completamente jugable desde la consola. Ofrece una experiencia de azar y estrategia sin gráficos avanzados, evocando el ambiente de un casino tradicional, pero en texto.
 
-**Por ejemplo:**
-Este proyecto consiste en un juego de aventuras donde el jugador debe explorar un mundo virtual, recoger objetos, resolver acertijos y enfrentar enemigos. El juego utiliza estructuras de control como `if`, `switch`, y bucles `while` y `for` para generar interacciones dinámicas.
+• Mecánica principal
+El jugador inicia con un monto fijo de dinero y puede apostar en distintos juegos clásicos del casino. Según el resultado de cada partida, gana o pierde dinero. Todo se gestiona mediante menús interactivos en consola.
+
+• Idea general de la jugabilidad
+Comienzas con una cantidad inicial (ej. $1000).
+
+Eliges entre 4 juegos disponibles.
+
+Decides cuánto apostar.
+
+Juegas y se muestra el resultado en pantalla.
+
+El saldo se actualiza según ganes o pierdas.
+
+Puedes seguir jugando o retirarte en cualquier momento mientras tengas dinero.
+
+• Aplicación de los temas vistos en clase
+Condicionales (if/else)
+
+Determinan si el jugador gana, pierde, o puede realizar una apuesta.
+
+Menús con switch
+
+Navegación por las distintas opciones del juego.
+
+Bucles (for, while)
+
+Repetición del menú mientras haya dinero o se desee seguir jugando.
+
+Uso en juegos como tragamonedas para simular tiradas.
+
+Funciones
+
+Cada juego está encapsulado en funciones.
+
+Otras funciones para menús y gestión del saldo.
+
+Tipos de datos y estructuras
+
+int para saldo y apuestas.
+
+float/double para premios y multiplicadores.
+
+char/string para respuestas y mensajes.
+
+bool para verificar estados.
+
+Arreglos/Matrices, por ejemplo, para los símbolos en tragamonedas (matriz 3x3).
+
+Manejo de archivos
+
+Guardado de saldo y progreso del jugador usando archivos de texto.
+
+Permite guardar y continuar partidas.
+
+
+
 
 ## Equipo
 
