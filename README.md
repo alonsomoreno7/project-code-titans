@@ -1,15 +1,15 @@
 # Proyecto de Code Titans C++ - casino virtual
 
-• Nombre del juego
+# Nombre del juego
 Casino Virtual: Consola Edición
 
-• Temática y ambientación
+# Temática y ambientación
 El juego simula un casino digital completamente jugable desde la consola. Ofrece una experiencia de azar y estrategia sin gráficos avanzados, evocando el ambiente de un casino tradicional, pero en texto.
 
-• Mecánica principal
+# Mecánica principal
 El jugador inicia con un monto fijo de dinero y puede apostar en distintos juegos clásicos del casino. Según el resultado de cada partida, gana o pierde dinero. Todo se gestiona mediante menús interactivos en consola.
 
-• Idea general de la jugabilidad
+# Idea general de la jugabilidad
 Comienzas con una cantidad inicial (ej. $1000).
 
 Eliges entre 4 juegos disponibles.
@@ -22,7 +22,7 @@ El saldo se actualiza según ganes o pierdas.
 
 Puedes seguir jugando o retirarte en cualquier momento mientras tengas dinero.
 
-• Aplicación de los temas vistos en clase
+# Aplicación de los temas vistos en clases
 Condicionales (if/else)
 
 Determinan si el jugador gana, pierde, o puede realizar una apuesta.
@@ -60,9 +60,6 @@ Manejo de archivos
 Guardado de saldo y progreso del jugador usando archivos de texto.
 
 Permite guardar y continuar partidas.
-
-
-
 
 ## Equipo
 
