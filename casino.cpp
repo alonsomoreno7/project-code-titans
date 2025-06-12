@@ -1,81 +1,128 @@
-#include <iostream>
+#include <iostream> 
 #include <string>
-#include "jugador.h"  // Incluimos el header donde definimos al jugador y funciones útiles
+#include "jugador.h"  // Aquí incluyo la definición de la clase Jugador y funciones que usaré
 
 using namespace std;
 
-// Función que muestra el menú principal con las opciones disponibles
+// Esta función solo muestra el menú con las opciones para que el jugador elija qué hacer
 void mostrarMenu() {
-    cout << "\nMenu Principal \n";
+    cout << "\nMenu Principal - Casino Virtual\n";
     cout << "=============================================\n";
-    cout << "1) Ruleta\n";
-    cout << "2) Blackjack\n";
-    cout << "3) Tragamonedas\n";
-    cout << "4) Craps (Dados)\n";
-    cout << "5) Salir del casino\n";
+    cout << "1) Depositar dinero\n";
+    cout << "2) Retirar dinero\n";
+    cout << "3) Ruleta\n";
+    cout << "4) Blackjack\n";
+    cout << "5) Tragamonedas\n";
+    cout << "6) Craps (Dados)\n";
+    cout << "7) Salir del casino\n";
     cout << "=============================================\n";
 }
 
 int main() {
-    Jugador jugador;              // Creamos una variable de tipo Jugador para almacenar datos del usuario
-    jugador.dinero = 1000;        // Inicializamos el dinero con una cantidad fija para empezar a jugar
+    Jugador jugador;  // Creo un jugador, que tendrá nombre y dinero
+    jugador.dinero = 0;  // Empiezo con saldo cero para obligar a depositar primero
 
-    // Pedimos al usuario que ingrese su nombre y validamos que sea correcto
+    // Pido el nombre del jugador, verificando que solo tenga letras y espacios
     do {
         cout << "Ingresa tu nombre para comenzar: ";
-        getline(cin, jugador.nombre);  // Usamos getline para permitir nombres con espacios
-        if (!nombreValido(jugador.nombre)) {  // Validamos que el nombre solo tenga letras y espacios
+        getline(cin, jugador.nombre);
+        // Si el nombre tiene caracteres inválidos, aviso y pido de nuevo
+        if (!nombreValido(jugador.nombre)) {
             cout << "Nombre inválido. Solo se permiten letras y espacios. Intenta de nuevo.\n";
         }
-    } while (!nombreValido(jugador.nombre));  // Repetimos hasta que el nombre sea válido
+    } while (!nombreValido(jugador.nombre));
 
-    // Mensaje de bienvenida personalizado con el nombre y el dinero inicial
-    cout << "¡Bienvenido, " << jugador.nombre << "! Tienes $" << jugador.dinero << " para jugar.\n";
+    // Saludo inicial con el saldo (que es cero, recordatorio para depositar)
+    cout << "¡Hola, " << jugador.nombre << "! Tu saldo inicial es de $" << jugador.dinero << ". Deposita dinero para empezar a jugar.\n";
 
-    bool jugando = true;   // Variable para controlar el ciclo principal del menú
-    int opcion;            // Variable donde almacenaremos la opción que elija el usuario
+    bool jugando = true;  // Esta variable controla si seguimos en el programa o salimos
+    int opcion;  // Aquí guardaré la opción que el usuario elija en el menú
 
-    // Ciclo principal del programa, se repite mientras el usuario no decida salir
+    // Empiezo el ciclo principal donde el jugador elige qué hacer
     while (jugando) {
-        mostrarMenu();  // Mostramos el menú de opciones
-        cout << "Dinero actual: $" << jugador.dinero << endl;  // Mostramos cuánto dinero tiene el jugador
-        cout << "Elige una opción (1-5): ";
-        cin >> opcion;   // Leemos la opción elegida
+        mostrarMenu();  // Muestro el menú para que el jugador vea las opciones
+        cout << "Dinero actual: $" << jugador.dinero << endl;
+        cout << "Elige una opción (1-7): ";
+        cin >> opcion;
 
-        // Comprobamos si la entrada es válida (es un número)
+        // Esto es para evitar que el programa crashee si el usuario mete letras u otra cosa rara
         if (cin.fail()) {
-            cin.clear();               // Limpiamos el error de entrada
-            cin.ignore(1000, '\n');    // Ignoramos el resto del input
-            cout << "Entrada inválida. Ingresa un número del 1 al 5.\n";
-            continue;                  // Volvemos al inicio del ciclo para pedir otra opción
+            cin.clear();  // Limpio el error
+            cin.ignore(1000, '\n');  // Ignoro la entrada inválida que quedó en el buffer
+            cout << "Entrada inválida. Ingresa un número del 1 al 7.\n";
+            continue;  // Vuelvo a pedir la opción sin hacer nada más
         }
 
-        // Procesamos la opción seleccionada con un switch
+        // Aquí manejo cada opción del menú según lo que el jugador haya elegido
         switch (opcion) {
-            case 1:
-                cout << "Ruleta - En proceso...\n";  // Mensaje provisional para la opción 1
+            case 1: {  // Opción para depositar dinero
+                int cantidad;
+                cout << "¿Cuánto dinero deseas depositar? $";
+                cin >> cantidad;
+                if (cantidad > 0) {
+                    jugador.depositar(cantidad);  // Llamo el método que suma el dinero y guarda el registro
+                } else {
+                    cout << "Cantidad inválida para depositar.\n";  // Si la cantidad es cero o negativa, aviso
+                }
                 break;
-            case 2:
-                cout << "Blackjack - En proceso...\n";  // Mensaje provisional para la opción 2
+            }
+            case 2: {  // Opción para retirar dinero
+                int cantidad;
+                cout << "¿Cuánto dinero deseas retirar? $";
+                cin >> cantidad;
+                if (cantidad > 0) {
+                    if (!jugador.retirar(cantidad)) {  // Intento retirar; si no es posible, aviso
+                        cout << "No se pudo realizar el retiro.\n";
+                    }
+                    // No llamo guardarRegistro aquí porque retiro() ya lo hace internamente
+                } else {
+                    cout << "Cantidad inválida para retirar.\n";  // Si la cantidad es 0 o negativa, aviso
+                }
                 break;
-            case 3:
-                cout << "Tragamonedas - En proceso...\n";  // Mensaje provisional para la opción 3
+            }
+            case 3:  // Ruleta (aquí solo muestro un mensaje, falta la lógica del juego)
+                if (jugador.dinero <= 0) {
+                    cout << "No tienes saldo suficiente. Deposita dinero para jugar.\n";
+                    break;
+                }
+                cout << "Juego en proceso...\n";
+                // Aquí debería ir la lógica para jugar ruleta y modificar el saldo
                 break;
-            case 4:
-                cout << "Craps (Dados) - En proceso...\n";  // Mensaje provisional para la opción 4
+            case 4:  // Blackjack 
+                if (jugador.dinero <= 0) {
+                    cout << "No tienes saldo suficiente. Deposita dinero para jugar.\n";
+                    break;
+                }
+                cout << "Juego en proceso...\n";
+                // Aquí iría la lógica para el blackjack
                 break;
-            case 5:
-                cout << "Gracias por jugar. ¡Hasta luego!\n";  // Mensaje al salir
-                jugando = false;  // Cambiamos la variable para terminar el ciclo y salir del programa
+            case 5:  // Tragamonedas
+                if (jugador.dinero <= 0) {
+                    cout << "No tienes saldo suficiente. Deposita dinero para jugar.\n";
+                    break;
+                }
+                cout << "Juego en proceso...\n";
+                // Falta lógica para tragamonedas
                 break;
-            default:
-                // Si la opción no está entre 1 y 5, avisamos al usuario
+            case 6:  // Craps (Dados)
+                if (jugador.dinero <= 0) {
+                    cout << "No tienes saldo suficiente. Deposita dinero para jugar.\n";
+                    break;
+                }
+                cout << "Juego en proceso...\n";
+                // Falta lógica para craps
+                break;
+            case 7:  // Salir del casino
+                cout << "Gracias por jugar. ¡Hasta luego!\n";
+                jugando = false;  // Cambio la variable para terminar el ciclo y salir del programa
+                break;
+            default:  // Si el usuario mete un número fuera del rango 1-7
                 cout << "Opción no válida. Intenta otra vez.\n";
         }
 
-        cin.ignore();  // Limpiamos el buffer para evitar problemas con getline en próximas entradas
-        cout << endl;  // Línea en blanco para que la salida se vea más limpia y ordenada
+        cin.ignore();  // Limpio el buffer para evitar que getline falle en próximas entradas
+        cout << endl;  // Solo para que se vea bonito y ordenado en la consola
     }
 
-    return 0;  // Fin del programa
+    return 0;  // Termina el programa
 }
