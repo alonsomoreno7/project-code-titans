@@ -1,2 +1,0 @@
-Jugador: alonso | Evento: Depósito | Cantidad: $200 | Dinero restante: $200
-Jugador: alonso | Evento: Retiro | Cantidad: $100 | Dinero restante: $100
