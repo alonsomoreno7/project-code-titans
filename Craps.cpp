@@ -1,39 +1,85 @@
 #include <iostream>
-#include <fstream>
-#include <string>
-#include <algorithm>
 #include <ctime>
 #include <cstdlib>
 
+#ifdef _WIN32
+    #include <windows.h>
+#else
+    #include <unistd.h>
+#endif
+
 using namespace std;
 
-// Funciones a diseñar:
-/*
-1. Funcion para generar el numero aleatorio y simular la tirada de los dados
-2. Funcion para generar la tirada de dados.
-*/
+// Caras ASCII de los dados
+const char* carasDados[6][5] = {
+    { "+-------+", "|       |", "|   o   |", "|       |", "+-------+" },
+    { "+-------+", "| o     |", "|       |", "|     o |", "+-------+" },
+    { "+-------+", "| o     |", "|   o   |", "|     o |", "+-------+" },
+    { "+-------+", "| o   o |", "|       |", "| o   o |", "+-------+" },
+    { "+-------+", "| o   o |", "|   o   |", "| o   o |", "+-------+" },
+    { "+-------+", "| o   o |", "| o   o |", "| o   o |", "+-------+" }
+};
 
-int GeneracionNumeroAletorio()
-{
-    srand(time(0));
-    return rand() % 10 + 1; // Números de 1 a 10 
+void mostrarDadosASCII(int d1, int d2) {
+    for (int i = 0; i < 5; ++i) {
+        cout << carasDados[d1 - 1][i] << "   " << carasDados[d2 - 1][i] << "\n";
+    }
+    cout << endl;
 }
 
-int main()
-{
+void limpiarPantalla() {
+    #ifdef _WIN32
+        system("cls");
+    #else
+        system("clear");
+    #endif
+}
+
+void esperarMilisegundos(int ms) {
+    #ifdef _WIN32
+        Sleep(ms);
+    #else
+        usleep(ms * 1000);
+    #endif
+}
+
+void pausar() {
+    esperarMilisegundos(5000); 
+}
+
+int lanzarDadosAnimado() {
+    int d1 = 1, d2 = 1;
+    for (int i = 0; i < 10; ++i) {
+        d1 = rand() % 6 + 1;
+        d2 = rand() % 6 + 1;
+
+        limpiarPantalla();
+        cout << "Lanzando dados...\n\n";
+        mostrarDadosASCII(d1, d2);
+        esperarMilisegundos(100);
+    }
+
+    cout << "Resultado final:\n\n";
+    mostrarDadosASCII(d1, d2);
+    return d1 + d2;
+}
+
+int main() {
+    srand(time(0));
     int come_out_roll = 0;
     int punto = 0;
-    // Version Demo - la mas basica
 
+    limpiarPantalla();
     cout << "||====================================================||\n";
     cout << "||           Bienvenido al juego de craps             ||\n";
-    cout << "||====================================================||\n";
+    cout << "||====================================================||\n\n";
 
-    // Probar la generacion de numeros aletorios
+    cout << "Iniciando el come-out roll...\n";
+    pausar();
 
-    come_out_roll = GeneracionNumeroAletorio();
-    cout << "Iniciando el come-out roll \n";
-    cout << "El come-out roll es : " << come_out_roll << "\n";
+    come_out_roll = lanzarDadosAnimado();
+    cout << "El come-out roll es: " << come_out_roll << "\n";
+    pausar();
 
     if (come_out_roll == 2 || come_out_roll == 3 || come_out_roll == 12)
     {
@@ -43,16 +89,20 @@ int main()
     {
         cout << "¡¡Felicidades , ganaste la ronda!! \n";
     }
-    else if (come_out_roll == 4 || come_out_roll == 5 || come_out_roll == 6 || come_out_roll == 9 || come_out_roll == 10)
+    else if (come_out_roll == 4 || come_out_roll == 5 || come_out_roll == 6 || come_out_roll == 8 || come_out_roll == 9  ||come_out_roll == 10 )
     {
         cout << "Este es el punto , aqui el shooter generara de nuevo un come-out roll ... \n";
         cout << "Si sale : " << come_out_roll << " entonces el shooter gana , si sale 7 entonce el shooter pierde \n";
         punto = come_out_roll;
+        pausar();
 
-        do
+    do
         {
-            come_out_roll = GeneracionNumeroAletorio();
+            come_out_roll = lanzarDadosAnimado();
+          
             cout << "El nuevo come-out roll es : " << come_out_roll << "\n";
+            pausar();
+
 
             if (come_out_roll == punto)
             {
