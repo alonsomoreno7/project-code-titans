@@ -3,53 +3,59 @@
 #include <cstdlib>
 
 #ifdef _WIN32
-    #include <windows.h>
+#include <windows.h>
 #else
-    #include <unistd.h>
+#include <unistd.h>
 #endif
 
 using namespace std;
 
 // Caras ASCII de los dados
-const char* carasDados[6][5] = {
-    { "+-------+", "|       |", "|   o   |", "|       |", "+-------+" },
-    { "+-------+", "| o     |", "|       |", "|     o |", "+-------+" },
-    { "+-------+", "| o     |", "|   o   |", "|     o |", "+-------+" },
-    { "+-------+", "| o   o |", "|       |", "| o   o |", "+-------+" },
-    { "+-------+", "| o   o |", "|   o   |", "| o   o |", "+-------+" },
-    { "+-------+", "| o   o |", "| o   o |", "| o   o |", "+-------+" }
-};
+const char *carasDados[6][5] = {
+    {"+-------+", "|       |", "|   o   |", "|       |", "+-------+"},
+    {"+-------+", "| o     |", "|       |", "|     o |", "+-------+"},
+    {"+-------+", "| o     |", "|   o   |", "|     o |", "+-------+"},
+    {"+-------+", "| o   o |", "|       |", "| o   o |", "+-------+"},
+    {"+-------+", "| o   o |", "|   o   |", "| o   o |", "+-------+"},
+    {"+-------+", "| o   o |", "| o   o |", "| o   o |", "+-------+"}};
 
-void mostrarDadosASCII(int d1, int d2) {
-    for (int i = 0; i < 5; ++i) {
+void mostrarDadosASCII(int d1, int d2)
+{
+    for (int i = 0; i < 5; ++i)
+    {
         cout << carasDados[d1 - 1][i] << "   " << carasDados[d2 - 1][i] << "\n";
     }
     cout << endl;
 }
 
-void limpiarPantalla() {
-    #ifdef _WIN32
-        system("cls");
-    #else
-        system("clear");
-    #endif
+void limpiarPantalla()
+{
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
 }
 
-void esperarMilisegundos(int ms) {
-    #ifdef _WIN32
-        Sleep(ms);
-    #else
-        usleep(ms * 1000);
-    #endif
+void esperarMilisegundos(int ms)
+{
+#ifdef _WIN32
+    Sleep(ms);
+#else
+    usleep(ms * 1000);
+#endif
 }
 
-void pausar() {
-    esperarMilisegundos(5000); 
+void pausar()
+{
+    esperarMilisegundos(5000); // Espera 2 segundos sin necesidad de presionar nada
 }
 
-int lanzarDadosAnimado() {
+int lanzarDadosAnimado()
+{
     int d1 = 1, d2 = 1;
-    for (int i = 0; i < 10; ++i) {
+    for (int i = 0; i < 10; ++i)
+    {
         d1 = rand() % 6 + 1;
         d2 = rand() % 6 + 1;
 
@@ -64,15 +70,11 @@ int lanzarDadosAnimado() {
     return d1 + d2;
 }
 
-int main() {
+void Jugabilidad()
+{
     srand(time(0));
     int come_out_roll = 0;
     int punto = 0;
-
-    limpiarPantalla();
-    cout << "||====================================================||\n";
-    cout << "||           Bienvenido al juego de craps             ||\n";
-    cout << "||====================================================||\n\n";
 
     cout << "Iniciando el come-out roll...\n";
     pausar();
@@ -89,30 +91,84 @@ int main() {
     {
         cout << "¡¡Felicidades , ganaste la ronda!! \n";
     }
-    else if (come_out_roll == 4 || come_out_roll == 5 || come_out_roll == 6 || come_out_roll == 8 || come_out_roll == 9  ||come_out_roll == 10 )
+    else if (come_out_roll == 4 || come_out_roll == 5 || come_out_roll == 6 || come_out_roll == 8 || come_out_roll == 9 || come_out_roll == 10)
     {
         cout << "Este es el punto , aqui el shooter generara de nuevo un come-out roll ... \n";
         cout << "Si sale : " << come_out_roll << " entonces el shooter gana , si sale 7 entonce el shooter pierde \n";
         punto = come_out_roll;
         pausar();
 
-    do
+        do
         {
             come_out_roll = lanzarDadosAnimado();
-          
+
             cout << "El nuevo come-out roll es : " << come_out_roll << "\n";
             pausar();
 
-
             if (come_out_roll == punto)
             {
-                cout << "¡¡Felicidades , has ganado \n"; break;
+                cout << "¡¡Felicidades , has ganado \n";
+                break;
             }
             else if (come_out_roll == 7)
             {
-                cout << "¡¡Lo sentimos , has perdido  \n"; break;
+                cout << "¡¡Lo sentimos , has perdido  \n";
+                break;
             }
         } while (true);
+    }
+}
+
+int main()
+{
+
+    int opcion = 0;
+
+    limpiarPantalla();
+    cout << "||====================================================||\n";
+    cout << "||           Bienvenido al juego de craps             ||\n";
+    cout << "||====================================================||\n";
+
+    cout << "A continuacion te presentamos el siguiente menu sobre la dificultad del juego : \n";
+
+    cout << "||====================================================||\n";
+    cout << "||                     1. Facil                       ||\n";
+    cout << "||                     2. Medio                       ||\n";
+    cout << "||                     3. Dificil                     ||\n";
+    cout << "||====================================================||\n";
+
+    cout << "Selecciona tu nivel de difiultad : \n";
+    cin >> opcion;
+
+    switch (opcion)
+    {
+    case 1:
+        cout << "Has accedido al nivel facil \n";
+        Jugabilidad();
+        break;
+
+    case 2:
+        cout << "Has accedido al nivel medio , tienes 5 intentos para lanzar los datos lograr el come-out roll \n";
+        for (int i = 1; i < 5; i++)
+        {
+            Jugabilidad();
+        }
+        break;
+
+    case 3:
+        cout << "Has accedido al nivel medio , tienes 3 intentos para lanzar los datos y lograr el come-out roll \n";
+        for (int i = 1; i < 3; i++)
+        {
+            Jugabilidad();
+        }
+
+        cout << "Lo sentimos , ya se te acabaron los intentos ... \n";
+
+        break;
+
+    default:
+        cout << "Opcion invalida ... \n";
+        break;
     }
 
     return 0;
