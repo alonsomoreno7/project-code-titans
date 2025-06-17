@@ -1,11 +1,10 @@
-// Incluyo el archivo jugador.h donde está toda la lógica y definiciones del jugador y el juego
+// Incluyo el archivo jugador.h donde está toda la lógica 
 #include "./src/jugador.h"
 
-// Función principal del programa, donde empieza la ejecución
-int main() {
-    // Llamo a la función iniciar(), que contiene el flujo principal del casino y maneja la interacción con el jugador
-    iniciar();
 
-    // Retorno 0 para indicar que el programa terminó correctamente
+int main() {
+    // Esta es la única función que llamo desde el main, porque en jugador.h ya controlo todo el flujo del casino.
+    menuInicio();
     return 0;
 }
+
