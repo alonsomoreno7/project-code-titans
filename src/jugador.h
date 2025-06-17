@@ -1,4 +1,3 @@
-
 #ifndef JUGADOR_H
 #define JUGADOR_H
 
@@ -10,7 +9,6 @@
 #include <ctime>     // Para usar time() y así inicializar rand()
 #include <limits>    // Para limpiar buffer con cin.ignore()
 #include <windows.h>
-
 
 using namespace std;
 
@@ -400,6 +398,7 @@ struct Jugador {
                 cout << "\nTe pasaste de 21. Perdiste.\n";
                 dinero -= apuesta;
                 registrarJuego("Blackjack", nombre, -apuesta, dinero);
+                guardarSaldo(nombre, dinero); // Actualiza el saldo después de perder
                 return;
             }
 
@@ -443,6 +442,8 @@ struct Jugador {
             dinero -= apuesta;
             registrarJuego("Blackjack", nombre, -apuesta, dinero);
         }
+
+        guardarSaldo(nombre, dinero); // Actualiza el saldo después de cada partida
     }
 };
 
@@ -455,7 +456,7 @@ inline void mostrarMenu() {
     cout << "2) Retirar dinero\n";
     cout << "3) Ruleta\n";
     cout << "4) Blackjack\n";
-    cout << "5) Tragamonedas\n";
+        cout << "5) Tragamonedas\n";
     cout << "6) Craps (Dados)\n";
     cout << "7) Mostrar historial\n";
     cout << "8) Salir\n";
@@ -544,7 +545,6 @@ inline void iniciar(const string& nombreUsuario) {
 
 // Menú de inicio que permite iniciar sesión, registrarse o recuperar contraseña
 inline void menuInicio() {
-    // Inicializo la semilla para números aleatorios para el código de recuperación
     srand(static_cast<unsigned int>(time(nullptr)));
 
     string nombre;
@@ -561,8 +561,8 @@ inline void menuInicio() {
         int opcion;
         cin >> opcion;
         if (cin.fail()) {
-            cin.clear();  // Limpia el error
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');  // Descarta basura en el buffer
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
             cout << "Entrada inválida. Por favor, ingresa un número.\n";
             continue;
         }
@@ -587,8 +587,7 @@ inline void menuInicio() {
         }
     }
 
-    iniciar(nombre);  // Una vez que se inicia sesión, paso a la función principal del juego
+    iniciar(nombre);  // Iniciar ciclo de juego después de login
 }
 
 #endif // JUGADOR_H
-
