@@ -1,0 +1,6 @@
+=== Usuario ===
+Nombre: alonso
+Contraseña: 123
+Código: 460818
+=================
+
