@@ -43,9 +43,13 @@ bool existeUsuario(const string& nombre) {
 
 // Guardo un nuevo usuario en usuarios.txt (nombre, contraseña y código de recuperación)
 void guardarUsuario(const string& nombre, const string& password, const string& codigo) {
-    ofstream archivo("usuarios.txt", ios::app);  // Abro en modo agregar (append)
+    ofstream archivo("usuarios.txt", ios::app);
     if (archivo.is_open()) {
-        archivo << nombre << "\n" << password << "\n" << codigo << "\n";
+        archivo << "=== Usuario ===\n";
+        archivo << "Nombre: " << nombre << "\n";
+        archivo << "Contraseña: " << password << "\n";
+        archivo << "Código: " << codigo << "\n";
+        archivo << "=================\n\n";
     }
 }
 
@@ -92,35 +96,56 @@ bool registrarUsuario() {
 
 // Inicio sesión pidiendo nombre y contraseña, verifico contra archivo usuarios.txt
 bool iniciarSesion(string& jugador) {
+    // Primero intento abrir el archivo donde están los usuarios
     ifstream archivo("usuarios.txt");
     if (!archivo.is_open()) {
+        // Si no puedo abrirlo, aviso y termino la función
         cout << "Error al abrir archivo de usuarios.\n";
         return false;
     }
 
-    string nombre, pass, codigo;
+    // Le pido al usuario que ingrese su nombre y contraseña
+    string nombreIngresado, passIngresada;
     cout << "\n=== Iniciar sesión ===\n";
     cout << "Nombre de usuario: ";
-    getline(cin, jugador);
+    getline(cin, nombreIngresado);
     cout << "Contraseña: ";
-    getline(cin, pass);
+    getline(cin, passIngresada);
 
     string linea;
+    // Empiezo a leer el archivo línea por línea buscando la etiqueta "=== Usuario ==="
     while (getline(archivo, linea)) {
-        string u = linea;         // Nombre guardado en archivo
-        if (!getline(archivo, pass)) break;   // Contraseña guardada
-        if (!getline(archivo, codigo)) break; // Código guardado
+        if (linea == "=== Usuario ===") {
+            // Cuando encuentro esa etiqueta, sé que vienen los datos de un usuario
+            string nombreArchivo, passArchivo, codigoArchivo;
 
-        // Aquí comparo nombre y contraseña que ingresó el usuario con las del archivo
-        if (u == jugador && pass == pass) {
-            cout << "¡Bienvenido, " << jugador << "!\n";
-            return true;
+            // Leo las siguientes líneas para obtener el nombre, contraseña y código
+            getline(archivo, linea);
+            nombreArchivo = linea.substr(8); // Quito "Nombre: " y me quedo con el nombre
+
+            getline(archivo, linea);
+            passArchivo = linea.substr(13); // Quito "Contraseña: " y guardo la contraseña
+
+            getline(archivo, linea);
+            codigoArchivo = linea.substr(8); // Quito "Código: " y guardo el código
+
+            // Leo la línea de cierre para avanzar
+            getline(archivo, linea);
+
+            // Comparo los datos que ingresó el usuario con los que acabo de leer
+            if (nombreArchivo == nombreIngresado && passArchivo == passIngresada) {
+                // Si coinciden, le doy la bienvenida y guardo su nombre en 'jugador'
+                jugador = nombreIngresado;
+                cout << "¡Bienvenido, " << jugador << "!\n";
+                return true; // Y retorno que todo salió bien
+            }
         }
     }
 
+    // Si llegué hasta aquí, significa que no encontré usuario con esos datos
     cout << "Credenciales incorrectas.\n";
-    jugador.clear();
-    return false;
+    jugador.clear(); // Limpio el nombre por si acaso
+    return false; // Retorno que no se pudo iniciar sesión
 }
 
 // Recupero contraseña usando el código de recuperación
