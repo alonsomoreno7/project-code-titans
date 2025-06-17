@@ -1,0 +1,1 @@
+Jugador: alonso | Evento: Blackjack | Cantidad: $2 | Resultado: Perdió | Dinero restante: $398

@@ -1,3 +1,4 @@
+
 #ifndef JUGADOR_H
 #define JUGADOR_H
 
@@ -8,6 +9,8 @@
 #include <cstdlib>   // Para usar rand()
 #include <ctime>     // Para usar time() y así inicializar rand()
 #include <limits>    // Para limpiar buffer con cin.ignore()
+#include <windows.h>
+
 
 using namespace std;
 
@@ -291,6 +294,156 @@ struct Jugador {
         else for (int i = 0; i < numRegistros; ++i)
             cout << (i + 1) << ") " << historial[i].descripcion << "\n";
     }
+
+    // ----------- Lógica del Blackjack -----------
+
+    int generarCarta() {
+        int carta = rand() % 13 + 1;
+        if (carta > 10) return 10;
+        if (carta == 1) return 11; // As como 11
+        return carta;
+    }
+
+    string obtenerPaloAleatorio() {
+        string palos[] = {"♠", "♥", "♦", "♣"};
+        return palos[rand() % 4];
+    }
+
+    string ajustarValor(int valor) {
+        if (valor == 11) return "A";
+        if (valor == 10) return "10";
+        if (valor == 9) return "9";
+        if (valor == 8) return "8";
+        if (valor == 7) return "7";
+        if (valor == 6) return "6";
+        if (valor == 5) return "5";
+        if (valor == 4) return "4";
+        if (valor == 3) return "3";
+        if (valor == 2) return "2";
+        return "?";
+    }
+
+    void mostrarCartasASCII(int valores[], string palos[], int cantidad) {
+        string lineas[7];
+        for (int i = 0; i < cantidad; i++) {
+            string valor = ajustarValor(valores[i]);
+            string izq = valor.length() == 1 ? valor + " " : valor;
+            string der = valor.length() == 1 ? " " + valor : valor;
+
+            lineas[0] += "┌─────────┐ ";
+            lineas[1] += "│" + izq + "       │ ";
+            lineas[2] += "│         │ ";
+            lineas[3] += "│    " + palos[i] + "    │ ";
+            lineas[4] += "│         │ ";
+            lineas[5] += "│       " + der + "│ ";
+            lineas[6] += "└─────────┘ ";
+        }
+
+        for (int i = 0; i < 7; i++) {
+            cout << lineas[i] << endl;
+        }
+    }
+
+    int calcularPuntaje(int cartas[], int numCartas) {
+        int suma = 0, ases = 0;
+        for (int i = 0; i < numCartas; i++) {
+            suma += cartas[i];
+            if (cartas[i] == 11) ases++;
+        }
+        while (suma > 21 && ases > 0) {
+            suma -= 10;
+            ases--;
+        }
+        return suma;
+    }
+
+    void jugarBlackjack() {
+        if (dinero <= 0) {
+            cout << "No tienes dinero para jugar Blackjack.\n";
+            return;
+        }
+
+        int apuesta;
+        cout << "Tu dinero actual es $" << dinero << ". Ingresa tu apuesta: $";
+        cin >> apuesta;
+
+        if (cin.fail() || apuesta <= 0 || apuesta > dinero) {
+            cin.clear(); cin.ignore(1000, '\n');
+            cout << "Apuesta inválida.\n";
+            return;
+        }
+
+        int valoresJugador[10], valoresDealer[10];
+        string palosJugador[10], palosDealer[10];
+        int numJugador = 0, numDealer = 0;
+
+        // Repartir 2 cartas a jugador y dealer
+        for (int i = 0; i < 2; i++) {
+            valoresJugador[numJugador] = generarCarta();
+            palosJugador[numJugador++] = obtenerPaloAleatorio();
+
+            valoresDealer[numDealer] = generarCarta();
+            palosDealer[numDealer++] = obtenerPaloAleatorio();
+        }
+
+        cout << "\nTus cartas:\n";
+        mostrarCartasASCII(valoresJugador, palosJugador, numJugador);
+        cout << "(Total: " << calcularPuntaje(valoresJugador, numJugador) << ")\n";
+
+        cout << "\nCarta visible del dealer:\n";
+        mostrarCartasASCII(valoresDealer, palosDealer, 1);
+
+        char opcion;
+        while (true) {
+            int puntaje = calcularPuntaje(valoresJugador, numJugador);
+            if (puntaje > 21) {
+                cout << "\nTe pasaste de 21. Perdiste.\n";
+                dinero -= apuesta;
+                registrarJuego("Blackjack", nombre, -apuesta, dinero);
+                return;
+            }
+
+            cout << "\n¿Quieres otra carta? (s/n): ";
+            cin >> opcion;
+            if (tolower(opcion) != 's') break;
+
+            valoresJugador[numJugador] = generarCarta();
+            palosJugador[numJugador++] = obtenerPaloAleatorio();
+
+            cout << "\nTus cartas:\n";
+            mostrarCartasASCII(valoresJugador, palosJugador, numJugador);
+            cout << "(Total: " << calcularPuntaje(valoresJugador, numJugador) << ")\n";
+        }
+
+        cout << "\nTurno del dealer...\n";
+        mostrarCartasASCII(valoresDealer, palosDealer, numDealer);
+        cout << "(Total: " << calcularPuntaje(valoresDealer, numDealer) << ")\n";
+
+        while (calcularPuntaje(valoresDealer, numDealer) < 17) {
+            valoresDealer[numDealer] = generarCarta();
+            palosDealer[numDealer++] = obtenerPaloAleatorio();
+
+            cout << "\nDealer toma carta:\n";
+            mostrarCartasASCII(valoresDealer, palosDealer, numDealer);
+            cout << "(Total: " << calcularPuntaje(valoresDealer, numDealer) << ")\n";
+        }
+
+        int puntajeJugador = calcularPuntaje(valoresJugador, numJugador);
+        int puntajeDealer = calcularPuntaje(valoresDealer, numDealer);
+
+        if (puntajeDealer > 21 || puntajeJugador > puntajeDealer) {
+            cout << "\n¡Ganaste!\n";
+            dinero += apuesta;
+            registrarJuego("Blackjack", nombre, apuesta, dinero);
+        } else if (puntajeJugador == puntajeDealer) {
+            cout << "\nEmpate. No ganas ni pierdes.\n";
+            registrarJuego("Blackjack", nombre, 0, dinero);
+        } else {
+            cout << "\nPerdiste.\n";
+            dinero -= apuesta;
+            registrarJuego("Blackjack", nombre, -apuesta, dinero);
+        }
+    }
 };
 
 // ----------- Menú -----------
@@ -350,11 +503,30 @@ inline void iniciar(const string& nombreUsuario) {
                 jugador.retirar(cantidad);
                 break;
             }
-            case 3: case 4: case 5: case 6:
+            case 3:
                 if (jugador.dinero <= 0)
                     cout << "No tienes saldo suficiente. Deposita para jugar.\n";
                 else
-                    cout << "Juego en proceso... (aquí se debe implementar la lógica del juego)\n";
+                    cout << "Ruleta aún no implementada.\n"; // Placeholder
+                break;
+            case 4:
+                if (jugador.dinero <= 0) {
+                    cout << "No tienes saldo suficiente. Deposita para jugar.\n";
+                } else {
+                    jugador.jugarBlackjack();
+                }
+                break;
+            case 5:
+                if (jugador.dinero <= 0)
+                    cout << "No tienes saldo suficiente. Deposita para jugar.\n";
+                else
+                    cout << "Tragamonedas aún no implementadas.\n"; // Placeholder
+                break;
+            case 6:
+                if (jugador.dinero <= 0)
+                    cout << "No tienes saldo suficiente. Deposita para jugar.\n";
+                else
+                    cout << "Craps aún no implementado.\n"; // Placeholder
                 break;
             case 7:
                 jugador.mostrarHistorial();
@@ -389,13 +561,13 @@ inline void menuInicio() {
         int opcion;
         cin >> opcion;
         if (cin.fail()) {
-        cin.clear();  // Limpia el error
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');  // Descarta basura en el buffer
-         cout << "Entrada inválida. Por favor, ingresa un número.\n";
-    continue;
-}
+            cin.clear();  // Limpia el error
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');  // Descarta basura en el buffer
+            cout << "Entrada inválida. Por favor, ingresa un número.\n";
+            continue;
+        }
 
-cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
         switch (opcion) {
             case 1:
@@ -419,3 +591,4 @@ cin.ignore(numeric_limits<streamsize>::max(), '\n');
 }
 
 #endif // JUGADOR_H
+
