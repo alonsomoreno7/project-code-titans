@@ -400,31 +400,40 @@ struct Jugador {
 
     // ----------- Lógica del Blackjack -----------
 
-    int generarCarta() {
-        int carta = rand() % 13 + 1;
-        if (carta > 10) return 10;
-        if (carta == 1) return 11; // As como 11
-        return carta;
-    }
+  int generarCarta() {
+    // Genero un número aleatorio entre 1 y 13 para representar una carta.
+    int carta = rand() % 13 + 1;
+    // Si la carta es mayor a 10, devuelvo 10 (J, Q, K).
+    if (carta > 10) return 10;
+    // Si la carta es un As, lo trato como 11.
+    if (carta == 1) return 11; // As como 11
+    // Devuelvo el valor de la carta.
+    return carta;
+}
 
-    string obtenerPaloAleatorio() {
-        string palos[] = {"♠", "♥", "♦", "♣"};
-        return palos[rand() % 4];
-    }
+    
+  string obtenerPaloAleatorio() {
+    // Defino los palos de las cartas.
+    string palos[] = {"♠", "♥", "♦", "♣"};
+    // Retorno un palo aleatorio.
+    return palos[rand() % 4];
+}
 
-    string ajustarValor(int valor) {
-        if (valor == 11) return "A";
-        if (valor == 10) return "10";
-        if (valor == 9) return "9";
-        if (valor == 8) return "8";
-        if (valor == 7) return "7";
-        if (valor == 6) return "6";
-        if (valor == 5) return "5";
-        if (valor == 4) return "4";
-        if (valor == 3) return "3";
-        if (valor == 2) return "2";
-        return "?";
-    }
+string ajustarValor(int valor) {
+    // Ajusto el valor de la carta a su representación en texto.
+    if (valor == 11) return "A"; // As
+    if (valor == 10) return "10"; // Diez
+    if (valor == 9) return "9"; // Nueve
+    if (valor == 8) return "8"; // Ocho
+    if (valor == 7) return "7"; // Siete
+    if (valor == 6) return "6"; // Seis
+    if (valor == 5) return "5"; // Cinco
+    if (valor == 4) return "4"; // Cuatro
+    if (valor == 3) return "3"; // Tres
+    if (valor == 2) return "2"; // Dos
+    // Si el valor no es válido, retorno un símbolo de interrogación.
+    return "?";
+}
 
     void mostrarCartasASCII(int valores[], string palos[], int cantidad) {
         string lineas[7];
@@ -447,109 +456,128 @@ struct Jugador {
         }
     }
 
-    int calcularPuntaje(int cartas[], int numCartas) {
-        int suma = 0, ases = 0;
-        for (int i = 0; i < numCartas; i++) {
-            suma += cartas[i];
-            if (cartas[i] == 11) ases++;
-        }
-        while (suma > 21 && ases > 0) {
-            suma -= 10;
-            ases--;
-        }
-        return suma;
+int calcularPuntaje(int cartas[], int numCartas) {
+    // Calculo el puntaje total de las cartas.
+    int suma = 0, ases = 0;
+    for (int i = 0; i < numCartas; i++) {
+        suma += cartas[i];
+        // Cuento cuántos Ases tengo.
+        if (cartas[i] == 11) ases++;
+    }
+    // Ajusto el puntaje si me paso de 21 y tengo Ases.
+    while (suma > 21 && ases > 0) {
+        suma -= 10; // Considero el As como 1 en lugar de 11.
+        ases--;
+    }
+    // Retorno el puntaje final.
+    return suma;
+}
+
+   void jugarBlackjack() {
+    // Verifico si tengo dinero para jugar.
+    if (dinero <= 0) {
+        cout << "No tienes dinero para jugar Blackjack.\n";
+        return;
     }
 
-    void jugarBlackjack() {
-        if (dinero <= 0) {
-            cout << "No tienes dinero para jugar Blackjack.\n";
+    int apuesta;
+    cout << "Tu dinero actual es $" << dinero << ". Ingresa tu apuesta: $";
+    cin >> apuesta;
+
+    // Verifico si la apuesta es válida.
+    if (cin.fail() || apuesta <= 0 || apuesta > dinero) {
+        cin.clear(); cin.ignore(1000, '\n');
+        cout << "Apuesta inválida.\n";
+        return;
+    }
+
+    // Inicializo los arreglos para las cartas del jugador y del dealer.
+    int valoresJugador[10], valoresDealer[10];
+    string palosJugador[10], palosDealer[10];
+    int numJugador = 0, numDealer = 0;
+
+    // Reparto 2 cartas a jugador y dealer.
+    for (int i = 0; i < 2; i++) {
+        valoresJugador[numJugador] = generarCarta();
+        palosJugador[numJugador++] = obtenerPaloAleatorio();
+
+        valoresDealer[numDealer] = generarCarta();
+        palosDealer[numDealer++] = obtenerPaloAleatorio();
+    }
+
+    // Muestro las cartas del jugador.
+    cout << "\nTus cartas:\n";
+    mostrarCartasASCII(valoresJugador, palosJugador, numJugador);
+    cout << "(Total: " << calcularPuntaje(valoresJugador, numJugador) << ")\n";
+
+    // Muestro la carta visible del dealer.
+    cout << "\nCarta visible del dealer:\n";
+    mostrarCartasASCII(valoresDealer, palosDealer, 1);
+
+    char opcion;
+    while (true) {
+        // Calculo el puntaje del jugador.
+        int puntaje = calcularPuntaje(valoresJugador, numJugador);
+        // Verifico si el jugador se pasó de 21.
+        if (puntaje > 21) {
+            cout << "\nTe pasaste de 21. Perdiste.\n";
+            dinero -= apuesta;
+            registrarJuego("Blackjack", nombre, -apuesta, dinero);
+            guardarSaldo(nombre, dinero); // Actualizo el saldo después de perder
             return;
         }
 
-        int apuesta;
-        cout << "Tu dinero actual es $" << dinero << ". Ingresa tu apuesta: $";
-        cin >> apuesta;
+        // Pregunto al jugador si quiere otra carta.
+        cout << "\n¿Quieres otra carta? (s/n): ";
+        cin >> opcion;
+        if (tolower(opcion) != 's') break;
 
-        if (cin.fail() || apuesta <= 0 || apuesta > dinero) {
-            cin.clear(); cin.ignore(1000, '\n');
-            cout << "Apuesta inválida.\n";
-            return;
-        }
+        // Reparto otra carta al jugador.
+        valoresJugador[numJugador] = generarCarta();
+        palosJugador[numJugador++] = obtenerPaloAleatorio();
 
-        int valoresJugador[10], valoresDealer[10];
-        string palosJugador[10], palosDealer[10];
-        int numJugador = 0, numDealer = 0;
-
-        // Repartir 2 cartas a jugador y dealer
-        for (int i = 0; i < 2; i++) {
-            valoresJugador[numJugador] = generarCarta();
-            palosJugador[numJugador++] = obtenerPaloAleatorio();
-
-            valoresDealer[numDealer] = generarCarta();
-            palosDealer[numDealer++] = obtenerPaloAleatorio();
-        }
-
+        // Muestro las cartas del jugador nuevamente.
         cout << "\nTus cartas:\n";
         mostrarCartasASCII(valoresJugador, palosJugador, numJugador);
         cout << "(Total: " << calcularPuntaje(valoresJugador, numJugador) << ")\n";
+    }
 
-        cout << "\nCarta visible del dealer:\n";
-        mostrarCartasASCII(valoresDealer, palosDealer, 1);
+    // Turno del dealer.
+    cout << "\nTurno del dealer...\n";
+    mostrarCartasASCII(valoresDealer, palosDealer, numDealer);
+    cout << "(Total: " << calcularPuntaje(valoresDealer, numDealer) << ")\n";
 
-        char opcion;
-        while (true) {
-            int puntaje = calcularPuntaje(valoresJugador, numJugador);
-            if (puntaje > 21) {
-                cout << "\nTe pasaste de 21. Perdiste.\n";
-                dinero -= apuesta;
-                registrarJuego("Blackjack", nombre, -apuesta, dinero);
-                guardarSaldo(nombre, dinero); // Actualiza el saldo después de perder
-                return;
-            }
+    // El dealer toma cartas hasta que su puntaje sea al menos 17.
+    while (calcularPuntaje(valoresDealer, numDealer) < 17) {
+        valoresDealer[numDealer] = generarCarta();
+        palosDealer[numDealer++] = obtenerPaloAleatorio();
 
-            cout << "\n¿Quieres otra carta? (s/n): ";
-            cin >> opcion;
-            if (tolower(opcion) != 's') break;
-
-            valoresJugador[numJugador] = generarCarta();
-            palosJugador[numJugador++] = obtenerPaloAleatorio();
-
-            cout << "\nTus cartas:\n";
-            mostrarCartasASCII(valoresJugador, palosJugador, numJugador);
-            cout << "(Total: " << calcularPuntaje(valoresJugador, numJugador) << ")\n";
-        }
-
-        cout << "\nTurno del dealer...\n";
+        cout << "\nDealer toma carta:\n";
         mostrarCartasASCII(valoresDealer, palosDealer, numDealer);
         cout << "(Total: " << calcularPuntaje(valoresDealer, numDealer) << ")\n";
-
-        while (calcularPuntaje(valoresDealer, numDealer) < 17) {
-            valoresDealer[numDealer] = generarCarta();
-            palosDealer[numDealer++] = obtenerPaloAleatorio();
-
-            cout << "\nDealer toma carta:\n";
-            mostrarCartasASCII(valoresDealer, palosDealer, numDealer);
-            cout << "(Total: " << calcularPuntaje(valoresDealer, numDealer) << ")\n";
-        }
-
-        int puntajeJugador = calcularPuntaje(valoresJugador, numJugador);
-        int puntajeDealer = calcularPuntaje(valoresDealer, numDealer);
-
-        if (puntajeDealer > 21 || puntajeJugador > puntajeDealer) {
-            cout << "\n¡Ganaste!\n";
-            dinero += apuesta;
-            registrarJuego("Blackjack", nombre, apuesta, dinero);
-        } else if (puntajeJugador == puntajeDealer) {
-            cout << "\nEmpate. No ganas ni pierdes.\n";
-            registrarJuego("Blackjack", nombre, 0, dinero);
-        } else {
-            cout << "\nPerdiste.\n";
-            dinero -= apuesta;
-            registrarJuego("Blackjack", nombre, -apuesta, dinero);
-        }
-
-        guardarSaldo(nombre, dinero); // Actualiza el saldo después de cada partida
     }
+
+    // Calculo los puntajes finales.
+    int puntajeJugador = calcularPuntaje(valoresJugador, numJugador);
+    int puntajeDealer = calcularPuntaje(valoresDealer, numDealer);
+
+    // Determino el resultado del juego.
+    if (puntajeDealer > 21 || puntajeJugador > puntajeDealer) {
+        cout << "\n¡Ganaste!\n";
+        dinero += apuesta;
+        registrarJuego("Blackjack", nombre, apuesta, dinero);
+    } else if (puntajeJugador == puntajeDealer) {
+        cout << "\nEmpate. No ganas ni pierdes.\n";
+        registrarJuego("Blackjack", nombre, 0, dinero);
+    } else {
+        cout << "\nPerdiste.\n";
+        dinero -= apuesta;
+        registrarJuego("Blackjack", nombre, -apuesta, dinero);
+    }
+
+    // Actualizo el saldo después de cada partida.
+    guardarSaldo(nombre, dinero);
+}
 };
 
 // ----------- Menú -----------
