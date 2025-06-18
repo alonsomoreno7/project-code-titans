@@ -75,6 +75,8 @@ Permite guardar y continuar partidas.
 
 4. Lizbeth Sofia Menjívar Castillo  00074525
 
+5. Carlos Eduardo Martínez Velasquez
+00207024
 ## Instrucciones de Ejecución
 
 1. Clona este repositorio en tu máquina local:
