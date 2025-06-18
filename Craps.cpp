@@ -140,6 +140,13 @@ int main()
     cout << "Selecciona tu nivel de difiultad : \n";
     cin >> opcion;
 
+    while (opcion <= 0 || opcion > 3)
+    {
+        cout << "Opcion incorrecta , por favor seleccione un opcion de nuestro menu \n";
+        cout << "Selecciona tu nivel de dificultad : \n";
+        cin >> opcion;
+    }
+
     switch (opcion)
     {
     case 1:
