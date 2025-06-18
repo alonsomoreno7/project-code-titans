@@ -14,6 +14,12 @@ using namespace std;
 
 const int MAX_REGISTROS = 100;  // Defino un máximo de registros para el historial del jugador
 
+// Defino constantes para los niveles de dificultad del blackjack
+const int NORMAL = 2;
+const int MEDIO = 3;
+const int DIFICIL = 4;
+
+
 // ----------- Validación del nombre -----------//
 
 // Esta función valida que el nombre solo tenga letras y espacios
@@ -472,14 +478,14 @@ int calcularPuntaje(int cartas[], int numCartas) {
     // Retorno el puntaje final.
     return suma;
 }
-
-   void jugarBlackjack() {
+void jugarBlackjack() {
     // Verifico si tengo dinero para jugar.
     if (dinero <= 0) {
         cout << "No tienes dinero para jugar Blackjack.\n";
         return;
     }
 
+    
     int apuesta;
     cout << "Tu dinero actual es $" << dinero << ". Ingresa tu apuesta: $";
     cin >> apuesta;
@@ -491,13 +497,30 @@ int calcularPuntaje(int cartas[], int numCartas) {
         return;
     }
 
-    // Inicializo los arreglos para las cartas del jugador y del dealer.
+    // Elijo el nivel de dificultad.
+    int nivelDificultad;
+    cout << "Selecciona el nivel de dificultad:\n";
+    cout << "1. Normal (2 cartas)\n";
+    cout << "2. Medio (3 cartas)\n";
+    cout << "3. Difícil (4 cartas)\n";
+    cout << "Opción: ";
+    cin >> nivelDificultad;
+
+    // Valido la opción de dificultad.
+    if (nivelDificultad < 1 || nivelDificultad > 3) {
+        cout << "Opción inválida. Se seleccionará Normal por defecto.\n";
+        nivelDificultad = 1; // Por defecto a Normal
+    }
+
+    // Determino la cantidad de cartas según la dificultad seleccionada.
+    int cartasIniciales = NORMAL + (nivelDificultad - 1); // Normal = 2, Medio = 3, Difícil = 4
+
     int valoresJugador[10], valoresDealer[10];
     string palosJugador[10], palosDealer[10];
     int numJugador = 0, numDealer = 0;
 
-    // Reparto 2 cartas a jugador y dealer.
-    for (int i = 0; i < 2; i++) {
+    // Reparto cartas según la dificultad seleccionada.
+    for (int i = 0; i < cartasIniciales; i++) {
         valoresJugador[numJugador] = generarCarta();
         palosJugador[numJugador++] = obtenerPaloAleatorio();
 
@@ -578,6 +601,7 @@ int calcularPuntaje(int cartas[], int numCartas) {
     // Actualizo el saldo después de cada partida.
     guardarSaldo(nombre, dinero);
 }
+
 };
 
 // ----------- Menú -----------
