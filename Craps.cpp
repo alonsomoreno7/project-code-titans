@@ -140,9 +140,12 @@ int main()
     cout << "Selecciona tu nivel de difiultad : \n";
     cin >> opcion;
 
-    while (opcion <= 0 || opcion > 3)
+    while (cin.fail() || cin.peek() != '\n' || opcion <= 0 || opcion > 3)
     {
-        cout << "Opcion incorrecta , por favor seleccione un opcion de nuestro menu \n";
+        cin.clear();
+        cin.ignore(1000, '\n');
+
+        cout << "Por favor no escriba letras ni caracteres especiales , solo numeros entre 1-3 \n";
         cout << "Selecciona tu nivel de dificultad : \n";
         cin >> opcion;
     }
