@@ -14,7 +14,7 @@ using namespace std;
 
 const int MAX_REGISTROS = 100;  // Defino un máximo de registros para el historial del jugador
 
-// ----------- Validación del nombre -----------
+// ----------- Validación del nombre -----------//
 
 // Esta función valida que el nombre solo tenga letras y espacios
 bool nombreValido(const string& nombre) {
@@ -24,6 +24,18 @@ bool nombreValido(const string& nombre) {
     }
     return true;
 }
+
+// ----------- Función para limpiar espacios  -----------//
+
+// Esta función me sirve para quitar los espacios en blanco al principio y final de una cadena
+string trim(const string& str) {
+    size_t first = str.find_first_not_of(" \t\n\r");
+    if (first == string::npos) return "";
+    size_t last = str.find_last_not_of(" \t\n\r");
+    return str.substr(first, (last - first + 1));
+}
+
+
 
 // ----------- Gestión de usuarios -----------
 
@@ -149,41 +161,134 @@ bool iniciarSesion(string& jugador) {
     return false; // Retorno que no se pudo iniciar sesión
 }
 
-// Recupero contraseña usando el código de recuperación
+// Aquí busco si existe un usuario con su respectivo código de recuperación
+// Si todo va bien, también recupero la contraseña original
+bool verificarCodigoRecuperacion(const string& nombre, const string& codigo, string& password) {
+    ifstream archivo("usuarios.txt");
+    if (!archivo.is_open()) return false; // Si el archivo no se puede abrir, regreso false.
+
+    string linea;
+    while (getline(archivo, linea)) {
+        if (linea == "=== Usuario ===") {
+            // Si llego aquí, empiezo a leer los datos del usuario
+            getline(archivo, linea);
+            string nombreArchivo = trim(linea.substr(8)); // Quito el "Nombre: "
+
+            getline(archivo, linea);
+            string passArchivo = trim(linea.substr(13)); // Quito el "Contraseña: "
+
+            getline(archivo, linea);
+            string codigoArchivo = trim(linea.substr(8)); // Quito el "Código: "
+
+            getline(archivo, linea); // Esta línea es solo decorativa, así que la ignoro
+
+            // Comparo el nombre y el código con los que recibí
+            if (nombreArchivo == nombre && codigoArchivo == codigo) {
+                password = passArchivo; // Guardo la contraseña si todo coincide
+                return true;
+            }
+        }
+    }
+    return false; // Si no encuentro coincidencia, regreso false
+}
+
+// Esta función la hice para reemplazar la contraseña vieja con una nueva directamente en el archivo.
+// Uso un archivo temporal para ir copiando todo, y luego reemplazo el archivo original.
+void actualizarContrasena(const string& nombre, const string& nuevaPass) {
+    ifstream archivo("usuarios.txt");
+    ofstream temp("temp.txt");
+
+    string linea;
+    while (getline(archivo, linea)) {
+        if (linea == "=== Usuario ===") {
+            temp << linea << '\n';
+
+            // Leo y copio el nombre
+            getline(archivo, linea);
+            string nombreArchivo = trim(linea.substr(8));
+            temp << "Nombre: " << nombreArchivo << '\n';
+
+            // Leo la contraseña actual (pero tal vez la cambie)
+            getline(archivo, linea);
+            string passArchivo = trim(linea.substr(13));
+
+            // Leo el código
+            getline(archivo, linea);
+            string codigoArchivo = trim(linea.substr(8));
+
+            // Leo el cierre decorativo
+            getline(archivo, linea);
+
+            // Si es el usuario al que quiero cambiarle la contraseña, lo hago aquí
+            if (nombreArchivo == nombre) {
+                temp << "Contraseña: " << nuevaPass << '\n';
+            } else {
+                temp << "Contraseña: " << passArchivo << '\n';
+            }
+
+            temp << "Código: " << codigoArchivo << '\n';
+            temp << "=================\n";
+        } else {
+            // Si no estoy en un bloque de usuario, copio la línea como está
+            temp << linea << '\n';
+        }
+    }
+
+    // Cierro ambos archivos
+    archivo.close();
+    temp.close();
+
+    // Borro el original y renombro el nuevo archivo como el principal
+    remove("usuarios.txt");
+    rename("temp.txt", "usuarios.txt");
+}
+
+
 void recuperarContrasena() {
-    string nombre, codigoIngresado;
+    string nombre, codigo, password;
     cout << "\n=== Recuperar Contraseña ===\n";
     cout << "Nombre de usuario: ";
     getline(cin, nombre);
     cout << "Ingresa tu código de recuperación: ";
-    getline(cin, codigoIngresado);
+    getline(cin, codigo);
 
-    ifstream archivo("usuarios.txt");
-    if (!archivo.is_open()) {
-        cout << "Error al abrir archivo de usuarios.\n";
-        return;
-    }
+    // Siempre limpio espacios antes de comparar, para evitar errores tontos
+    nombre = trim(nombre);
+    codigo = trim(codigo);
 
-    string linea;
-    while (getline(archivo, linea)) {
-        string u = linea;
-        string p, c;
-        if (!getline(archivo, p)) break;
-        if (!getline(archivo, c)) break;
+    // Aquí uso mi función para verificar el código y recuperar la contraseña
+    if (verificarCodigoRecuperacion(nombre, codigo, password)) {
+        cout << "¡Código correcto! Tu contraseña actual es: " << password << "\n";
 
-        if (u == nombre) {
-            if (c == codigoIngresado) {
-                cout << "¡Código correcto! Tu contraseña es: " << p << "\n";
-                return;
+        // Le doy la opción de cambiarla
+        string nuevaPass, confirmar;
+        cout << "\n¿Deseas cambiar tu contraseña? (s/n): ";
+        string respuesta;
+        getline(cin, respuesta);
+
+        if (respuesta == "s" || respuesta == "S") {
+            // Pido y confirmo la nueva contraseña
+            cout << "Nueva contraseña: ";
+            getline(cin, nuevaPass);
+            cout << "Confirma tu nueva contraseña: ";
+            getline(cin, confirmar);
+
+            // Si todo está bien, la actualizo
+            if (nuevaPass == confirmar && !nuevaPass.empty()) {
+                actualizarContrasena(nombre, nuevaPass);
+                cout << "¡Contraseña actualizada exitosamente!\n";
             } else {
-                cout << "Código incorrecto.\n";
-                return;
+                cout << "Las contraseñas no coinciden o están vacías. No se actualizó nada.\n";
             }
+        } else {
+            cout << "No se hizo ningún cambio. Puedes seguir usando tu contraseña actual.\n";
         }
+    } else {
+        // Si algo falla, doy el aviso
+        cout << "Usuario o código incorrecto.\n";
     }
-
-    cout << "Usuario no encontrado.\n";
 }
+
 
 // ----------- Movimiento, juegos y saldo -----------
 

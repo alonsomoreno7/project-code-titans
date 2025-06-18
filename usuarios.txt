@@ -1,6 +1,18 @@
 === Usuario ===
 Nombre: alonso
-Contraseña: 123
+Contraseña: 124
 Código: 460818
+=================
+
+=== Usuario ===
+Nombre: marco
+Contraseña: 1234
+Código: 951993
+=================
+
+=== Usuario ===
+Nombre: sofi
+Contraseña: 12345
+Código: 126243
 =================
 
