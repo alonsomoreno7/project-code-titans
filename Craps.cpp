@@ -1,7 +1,6 @@
 #include <iostream>
 #include <ctime>
 #include <cstdlib>
-
 #ifdef _WIN32
 #include <windows.h>
 #else
@@ -72,6 +71,7 @@ int lanzarDadosAnimado()
 
 int Jugabilidad(int intentosMaximos = 0)
 {
+    SetConsoleOutputCP(CP_UTF8);
     srand(time(0));
     int come_out_roll = 0;
     int punto = 0;
@@ -85,12 +85,23 @@ int Jugabilidad(int intentosMaximos = 0)
 
     if (come_out_roll == 2 || come_out_roll == 3 || come_out_roll == 12)
     {
-        cout << "Se ha generado un craps , has perdido la partida \n";
+
+        cout << "╔═══════════════════════════════════════════════════╗\n";
+        cout << "║                 ♠ ♥ Perdiste ♥ ♣                  ║\n";
+        cout << "║                                                   ║\n";
+        cout << "║ Se ha generado un craps , has perdido la partida  ║\n";
+        cout << "║                                                   ║\n";
+        cout << "╚═══════════════════════════════════════════════════╝\n";
         return 0;
     }
     else if (come_out_roll == 7 || come_out_roll == 11)
     {
-        cout << "Felicidades , ganaste la ronda!! \n";
+        cout << "╔═══════════════════════════════════════════════╗\n";
+        cout << "║                 ♠ ♥ Ganaste ♥ ♣               ║\n";
+        cout << "║                                               ║\n";
+        cout << "║        Felicidades , has ganado  la ronda     ║\n";
+        cout << "║                                               ║\n";
+        cout << "╚═══════════════════════════════════════════════╝\n";
         return 0;
     }
     else if (come_out_roll == 4 || come_out_roll == 5 || come_out_roll == 6 || come_out_roll == 8 || come_out_roll == 9 || come_out_roll == 10)
@@ -103,52 +114,53 @@ int Jugabilidad(int intentosMaximos = 0)
         int intentos = 0;
         while (intentosMaximos == 0 || intentos < intentosMaximos)
         {
-           
+
             intentos++;
             come_out_roll = lanzarDadosAnimado();
-
+            cout << "Intento:#" << intentos << endl;
             cout << "El nuevo come-out roll es : " << come_out_roll << "\n";
-            cout << "Intento:#" <<intentos <<endl;
+
             pausar();
 
             if (come_out_roll == punto)
             {
-                cout << "Felicidades , has ganado \n";
+                cout << "╔═════════════════════════════════════════════════════╗\n";
+                cout << "║                    ♠ ♥ Ganaste ♥ ♣                  ║\n";
+                cout << "║                                                     ║\n";
+                cout << "║                Felicidades , has ganado             ║\n";
+                cout << "║                                                     ║\n";
+                cout << "╚═════════════════════════════════════════════════════╝\n";
                 return 0;
             }
             else if (come_out_roll == 7)
             {
-                cout << "Lo sentimos , has perdido  \n";
+                cout << "╔═════════════════════════════════════════════════════╗\n";
+                cout << "║                   ♠ ♥ Perdiste ♥ ♣                  ║\n";
+                cout << "║                                                     ║\n";
+                cout << "║               Lo sentimos , has perdido             ║\n";
+                cout << "║                                                     ║\n";
+                cout << "╚═════════════════════════════════════════════════════╝\n";
+
                 return 0;
             }
-
-          
         }
 
-        cout << "Lo sentimos , ya se te acabaron los intentos ... \n";
+        cout << "╔═══════════════════════════════════════════════════╗\n";
+        cout << "║                  ♠ ♥ Mensaje ♥ ♣                  ║\n";
+        cout << "║                                                   ║\n";
+        cout << "║   Lo sentimos , ya se te acabaron los intentos    ║\n";
+        cout << "║                                                   ║\n";
+        cout << "╚═══════════════════════════════════════════════════╝\n";
+
+        cout << " ... \n";
     }
 }
 
-int main()
+int Validacion()
 {
-
-    int resultado;
+    SetConsoleOutputCP(CP_UTF8);
     int opcion = 0;
-
-    limpiarPantalla();
-    cout << "||====================================================||\n";
-    cout << "||           Bienvenido al juego de craps             ||\n";
-    cout << "||====================================================||\n";
-
-    cout << "A continuacion te presentamos el siguiente menu sobre la dificultad del juego : \n";
-
-    cout << "||====================================================||\n";
-    cout << "||                     1. Facil                       ||\n";
-    cout << "||                     2. Medio                       ||\n";
-    cout << "||                     3. Dificil                     ||\n";
-    cout << "||====================================================||\n";
-
-    cout << "Selecciona tu nivel de difiultad : \n";
+    cout << "Selecciona tu nivel de dificultad : \n";
     cin >> opcion;
 
     while (cin.fail() || cin.peek() != '\n' || opcion <= 0 || opcion > 3)
@@ -156,12 +168,43 @@ int main()
         cin.clear();
         cin.ignore(1000, '\n');
 
-        cout << "Por favor no escriba letras ni caracteres especiales , solo numeros entre 1-3 \n";
-        cout << "Selecciona tu nivel de dificultad : \n";
+        cout << "╔══════════════════════════════════════════════════════════════════════════════════════════════════════╗\n";
+        cout << "║                                                                                                      ║\n";
+        cout << "║                                            ♠ ♥ Mensaje ♥ ♣                                           ║\n";
+        cout << "║                                                                                                      ║\n";
+        cout << "║               Por favor no escriba letras ni caracteres especiales , solo numeros entre 1-3          ║\n";
+        cout << "║                                                                                                      ║\n";
+        cout << "║               Selecciona tu nivel de dificultad :                                                    ║\n";
+        cout << "╚══════════════════════════════════════════════════════════════════════════════════════════════════════╝\n";
         cin >> opcion;
     }
 
-    switch (opcion)
+ 3   return opcion;
+}
+
+void MostrarMenu()
+{
+    SetConsoleOutputCP(CP_UTF8);
+
+    cout << "\n";
+    cout << "╔═══════════════════════════════════════════════════════════════════════╗\n";
+    cout << "║                       ♠ ♥ Bienvenido a Craps ♥ ♣                      ║\n";
+    cout << "║                                                                       ║\n";
+    cout << "║            ¡Prepárate para probar tu suerte en este juego!            ║\n";
+    cout << "║                                                                       ║\n";
+    cout << "║          Selecciona el nivel de dificultad para comenzar:             ║\n";
+    cout << "║                                                                       ║\n";
+    cout << "║                  1. Fácil     ♣     2. Medio     ♦                    ║\n";
+    cout << "║                            3. Difícil     ♠                           ║\n";
+    cout << "║                                                                       ║\n";
+    cout << "╚═══════════════════════════════════════════════════════════════════════╝\n";
+    cout << "\n";
+}
+
+int Niveles(int seleccion)
+{
+    SetConsoleOutputCP(CP_UTF8);
+    switch (seleccion)
     {
     case 1:
         cout << "Has accedido al nivel facil \n";
@@ -169,14 +212,26 @@ int main()
         break;
 
     case 2:
-        cout << "Has accedido al nivel medio , tienes 5 intentos para lanzar los datos lograr el come-out roll \n";
+        cout << "╔══════════════════════════════════════════════════════════════════════════════════════════════════════╗\n";
+        cout << "║                                                                                                      ║\n";
+        cout << "║                                            ♠ ♥ Mensaje ♥ ♣                                           ║\n";
+        cout << "║                                                                                                      ║\n";
+        cout << "║   Has accedido al nivel medio , tienes 5 intentos para lanzar los datos lograr el come-out roll      ║\n";
+        cout << "║                                                                                                      ║\n";
+        cout << "╚══════════════════════════════════════════════════════════════════════════════════════════════════════╝\n";
 
         Jugabilidad(5);
 
         break;
 
     case 3:
-        cout << "Has accedido al nivel medio , tienes 3 intentos para lanzar los datos y lograr el come-out roll \n";
+        cout << "╔══════════════════════════════════════════════════════════════════════════════════════════════════════╗\n";
+        cout << "║                                                                                                      ║\n";
+        cout << "║                                            ♠ ♥ Mensaje ♥ ♣                                           ║\n";
+        cout << "║                                                                                                      ║\n";
+        cout << "║   Has accedido al nivel medio , tienes 3 intentos para lanzar los datos lograr el come-out roll      ║\n";
+        cout << "║                                                                                                      ║\n";
+        cout << "╚══════════════════════════════════════════════════════════════════════════════════════════════════════╝\n";
         Jugabilidad(3);
 
         break;
@@ -185,6 +240,14 @@ int main()
         cout << "Opcion invalida ... \n";
         break;
     }
+}
 
+int main()
+{
+    int seleccion = 0;
+    limpiarPantalla();
+    MostrarMenu();
+    seleccion = Validacion();
+    Niveles(seleccion);
     return 0;
 }
