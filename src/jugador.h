@@ -9,6 +9,7 @@
 #include <ctime>     // Para usar time() y así inicializar rand()
 #include <limits>    // Para limpiar buffer con cin.ignore()
 #include <windows.h>
+#include "hilo.h"
 
 using namespace std;
 
@@ -716,10 +717,11 @@ inline void mostrarMenu() {
     cout << "2) Retirar dinero\n";
     cout << "3) Ruleta\n";
     cout << "4) Blackjack\n";
-        cout << "5) Tragamonedas\n";
+    cout << "5) Tragamonedas\n";
     cout << "6) Craps (Dados)\n";
-    cout << "7) Mostrar historial\n";
-    cout << "8) Salir\n";
+    cout << "7) Hi-Lo\n";
+    cout << "8) Mostrar historial\n";
+    cout << "9) Salir\n";
 }
 
 // Función principal que maneja el ciclo del juego después de iniciar sesión
@@ -790,9 +792,15 @@ inline void iniciar(const string& nombreUsuario) {
                     cout << "Craps aún no implementado.\n"; // Placeholder
                 break;
             case 7:
-                jugador.mostrarHistorial();
+                if (jugador.dinero <= 0)
+                    cout << "No tienes saldo suficiente. Deposita para jugar.\n";
+                else
+                    PlayHilo(jugador.dinero);
                 break;
             case 8:
+                jugador.mostrarHistorial();
+                break;
+            case 9:
                 cout << "Gracias por jugar. ¡Hasta luego!\n";
                 jugando = false;
                 break;

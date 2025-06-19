@@ -6,3 +6,9 @@ Código: 009127
 
 
 
+=== Usuario ===
+Nombre: carlos
+Contraseña: 321
+Código: 499824
+=================
+
