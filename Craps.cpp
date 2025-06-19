@@ -70,7 +70,7 @@ int lanzarDadosAnimado()
     return d1 + d2;
 }
 
-void Jugabilidad()
+int Jugabilidad(int intentosMaximos = 0)
 {
     srand(time(0));
     int come_out_roll = 0;
@@ -86,10 +86,12 @@ void Jugabilidad()
     if (come_out_roll == 2 || come_out_roll == 3 || come_out_roll == 12)
     {
         cout << "Se ha generado un craps , has perdido la partida \n";
+        return 0;
     }
     else if (come_out_roll == 7 || come_out_roll == 11)
     {
-        cout << "¡¡Felicidades , ganaste la ronda!! \n";
+        cout << "Felicidades , ganaste la ronda!! \n";
+        return 0;
     }
     else if (come_out_roll == 4 || come_out_roll == 5 || come_out_roll == 6 || come_out_roll == 8 || come_out_roll == 9 || come_out_roll == 10)
     {
@@ -98,30 +100,39 @@ void Jugabilidad()
         punto = come_out_roll;
         pausar();
 
-        do
+        int intentos = 0;
+        while (intentosMaximos == 0 || intentos < intentosMaximos)
         {
+           
+            intentos++;
             come_out_roll = lanzarDadosAnimado();
 
             cout << "El nuevo come-out roll es : " << come_out_roll << "\n";
+            cout << "Intento:#" <<intentos <<endl;
             pausar();
 
             if (come_out_roll == punto)
             {
-                cout << "¡¡Felicidades , has ganado \n";
-                break;
+                cout << "Felicidades , has ganado \n";
+                return 0;
             }
             else if (come_out_roll == 7)
             {
-                cout << "¡¡Lo sentimos , has perdido  \n";
-                break;
+                cout << "Lo sentimos , has perdido  \n";
+                return 0;
             }
-        } while (true);
+
+          
+        }
+
+        cout << "Lo sentimos , ya se te acabaron los intentos ... \n";
     }
 }
 
 int main()
 {
 
+    int resultado;
     int opcion = 0;
 
     limpiarPantalla();
@@ -159,20 +170,14 @@ int main()
 
     case 2:
         cout << "Has accedido al nivel medio , tienes 5 intentos para lanzar los datos lograr el come-out roll \n";
-        for (int i = 1; i < 5; i++)
-        {
-            Jugabilidad();
-        }
+
+        Jugabilidad(5);
+
         break;
 
     case 3:
         cout << "Has accedido al nivel medio , tienes 3 intentos para lanzar los datos y lograr el come-out roll \n";
-        for (int i = 1; i < 3; i++)
-        {
-            Jugabilidad();
-        }
-
-        cout << "Lo sentimos , ya se te acabaron los intentos ... \n";
+        Jugabilidad(3);
 
         break;
 
