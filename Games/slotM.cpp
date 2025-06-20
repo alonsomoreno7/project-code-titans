@@ -2,6 +2,15 @@
 #include <cstring>
 using namespace std;
 
+//funcion para cambiar el texto de color
+void setColor(int colorCode) {
+    cout << "\033[" << colorCode << "m"; 
+}
+//funcion para volver al color blanco
+void resetColor() {
+    cout << "\033[0m";
+}
+
 // Funcion para mostrar las intrucciones del juego
 void showSlot()
 {
@@ -84,7 +93,19 @@ void finalSlotsE (char slots[3]) {
     cout<<"*    -----------------------     ."<<endl;
     cout<<".   |       |       |       |    *"<< endl;
     //En esta linea se mostraran los simbolos aleatorios
-    cout<<".   |   "<< slots[0]<<"   | "<< "  "<< slots[1]<<"   | "<< "  "<< slots[2]<<"   |    |" <<endl;
+    cout<<".   |   ";
+    setColor(33); //color amarillo
+    cout<< slots[0];
+    resetColor(); 
+    cout<<"   | "<< "  ";
+    setColor(33);  //color amarillo
+    cout<< slots[1];
+    resetColor(); 
+    cout<<"   | "<< "  ";
+    setColor(33); //color amarillo
+    cout<< slots[2];
+    resetColor(); 
+    cout<<"   |    |" <<endl;
     cout<<".   |       |       |       |    *"<< endl;
     cout<<".    -----------------------     |"<<endl;
     cout<<". . . . . . .* - * - * - * - * - *"<<endl;
@@ -161,7 +182,9 @@ void easyMode(){
                     break; //si se ingresa "P" o "p" el bucle while termina y se continua con el juego.
                 }else{
                     cout<<endl;
+                    setColor(31); //color rojo
                     cout<<"Please enter a valid option (P), try again."<<endl; //si no se envia mensaje de error 
+                    resetColor();
                           
                     //el bucle se repite hasta que el usuario ingrese "P" 
                 }
@@ -182,14 +205,19 @@ void easyMode(){
                     finalSlotsE(symbols); //Se llama a la funcion Mostrar slots finales al jugador
                 
                     if(jackpotE(symbols)){
+                        setColor(32); //color verde
                         cout<<"            * JACKPOT!! *   "<<endl;
+                        resetColor();
                         cout<<endl;
                         cout<<" Congratulations!! you have earned: $x"<<endl;
+                        cout<<endl;
                         i=0;
                         playerLose=0;
                         break;
                     }else{
+                        setColor(36); //color cian
                         cout<<"            KEEP TRYING "<<endl;
+                        resetColor();
                         losePhrases();
                         playerLose=1;
                         break;
@@ -198,7 +226,9 @@ void easyMode(){
                 
                 }else{
                     cout<<endl;
+                    setColor(31); //color rojo
                     cout<<"Please enter a valid option (!), try again."<<endl;
+                    resetColor();
                     //si no se envia mensaje de error 
                     //el bucle se repite hasta que el usuario ingrese "!" 
                 
@@ -216,19 +246,26 @@ void easyMode(){
         }
 
         while(true){ //while infinito para validar que se ingreso un caracter valido
-            cout<<"Do you want to play another round?"<<endl;
+            cout<<"\nDo you want to play another round?"<<endl;
             cout<<"     YES (Y).        NO(N)"<<endl;
             getline(cin,anotherRound); //jugador ingresa su opccion y se lee su respuesta
 
             if(anotherRound=="Y"||anotherRound=="y"){
+                cout<<endl;
+                setColor(32); //color verde
                 cout<<"GOOD LUCK!!"<<endl; //si se ingresa "Y" o "y" (yes) el bucle termina
+                resetColor();
                 anotherRound="";
                 break;
             }else if(anotherRound=="N"||anotherRound=="n"){
+                cout<<endl;
                 cout<<"Return to menu..."<<endl; //si se ingresa "N" o "n" (no) el bucle termina
                 break;
             }else{
+                cout<<endl;
+                setColor(31); //color rojo
                 cout<<"Please enter a valid option (Y) or (N), try again."<<endl; 
+                resetColor();
                 //si no se envia mensaje de error y el bucle se repite
             }
 
@@ -236,7 +273,7 @@ void easyMode(){
 
         if(anotherRound=="N"||anotherRound=="n"){ //validar si el juegador eligio si o no
             break; //si el usuario ingreso "N" o "n" (no) la funcion termina
-        } 
+        }
 
     }
 
@@ -270,6 +307,7 @@ int main(){
                     break; //Volver al anterior menu
                 } else if (option == "E"||option=="e"){
                     easyMode();
+
                 } else if (option == "M"||option=="m"){
 
                 } else if (option == "H"||option=="h"){
@@ -277,8 +315,10 @@ int main(){
                 } else {
 
                     // se muestra mensaje de error y se vuelve a pedir ingresar una opccion
+                    //color rojo
+                    setColor(31);
                     cout << "Please enter a valid option (E),(M),(D) or (B), try again." << endl;
-
+                    resetColor();
                 }
 
             }
@@ -286,7 +326,10 @@ int main(){
         else
         {
             // se muestra mensaje de error y se vuelve a pedir ingresar una opccion
+            setColor(31); //color rojo
             cout << "Please enter a valid option (M) or (P), try again." << endl;
+            resetColor(); 
+            
         }
     }
 
