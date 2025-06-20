@@ -1,9 +1,9 @@
 #include <iostream>
-#include <fstream>
 #include <string>
 #include <algorithm>
 #include <ctime>
 #include <cstdlib>
+#include <fstream> 
 #include "hilo.h"
 
 using namespace std;
@@ -13,6 +13,7 @@ int RandomCard() {
     return rand() % 13 + 1;
 }
 
+//makes random suits for the cards
 string RandomSuit() {
     string suit[] = {"♠", "♥", "♦", "♣"};
     return suit[rand() % 4];
@@ -172,7 +173,7 @@ void PlayHilo(int& balance){
             cout << "2. The dealer shows you a card.\n";
             cout << "3. Now it's your turn to guess -> will the next card be higher or lower?\n\n";
             cout << "If you guess right:\n";
-            cout << "- You get your bet back plus a 0.5% bonus.\n";
+            cout << "- You get your bet back doubled.\n";
             cout << "- You can keep playing to try and win even more, or cash out and take your reward.\n\n";
             cout << "If you guess wrong:\n";
             cout << "- You lose your bet \n\n";
