@@ -215,17 +215,28 @@ void easyMode(){
             cout<<endl;
         }
 
-        cout<<"Do you want to play another round?"<<endl;
-        cout<<"     YES (Y).        NO(N)"<<endl;
-        getline(cin,anotherRound);
+        while(true){ //while infinito para validar que se ingreso un caracter valido
+            cout<<"Do you want to play another round?"<<endl;
+            cout<<"     YES (Y).        NO(N)"<<endl;
+            getline(cin,anotherRound); //jugador ingresa su opccion y se lee su respuesta
 
-        if(anotherRound=="Y"||anotherRound=="y"){
-            cout<<"GOOD LUCK!!"<<endl;
-        }if(anotherRound=="N"||anotherRound=="n"){
-            cout<<"Return to menu..."<<endl;
-            break;
+            if(anotherRound=="Y"||anotherRound=="y"){
+                cout<<"GOOD LUCK!!"<<endl; //si se ingresa "Y" o "y" (yes) el bucle termina
+                anotherRound="";
+                break;
+            }else if(anotherRound=="N"||anotherRound=="n"){
+                cout<<"Return to menu..."<<endl; //si se ingresa "N" o "n" (no) el bucle termina
+                break;
+            }else{
+                cout<<"Please enter a valid option (Y) or (N), try again."<<endl; 
+                //si no se envia mensaje de error y el bucle se repite
+            }
+
         }
-        
+
+        if(anotherRound=="N"||anotherRound=="n"){ //validar si el juegador eligio si o no
+            break; //si el usuario ingreso "N" o "n" (no) la funcion termina
+        } 
 
     }
 
