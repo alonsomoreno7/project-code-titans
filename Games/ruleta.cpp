@@ -74,4 +74,98 @@ void calcularPosiciones() {
         posiciones[i].y = CENTRO_Y + int(RADIO * sin(angulo));
     }
 }
+void imprimirCanvas(int iluminado) {
+    string canvas[HEIGHT][WIDTH];
+    // Primero lleno todo con espacios para limpiar el canvas
+    for (int i = 0; i < HEIGHT; i++)
+        for (int j = 0; j < WIDTH; j++)
+            canvas[i][j] = " ";
 
+    // se pone  cada numero en su posición con el color correspondiente
+    for (int i = 0; i < NUMEROS; i++) {
+        int x = posiciones[i].x;
+        int y = posiciones[i].y;
+        string color = (colores[i] == 'R') ? rojo : (colores[i] == 'N') ? negro : verde;
+
+        // Si es el número iluminado se resalta con fondo blanco
+        if (i == iluminado) color = fondo_blanco + color;
+
+        string numStr = (numeros[i] < 10 ? " " : "") + to_string(numeros[i]);
+
+        // se verifica que la posición este dentro del canvas
+        if (x >= 0 && x + 1 < WIDTH && y >= 0 && y < HEIGHT) {
+            canvas[y][x] = color + numStr + reset;
+            canvas[y][x + 1] = ""; // Evito sobreescribir por error
+        }
+    }
+ // se agregan puntos para poder darle un efecto de círculo
+    for (int r = 1; r < RADIO - 2; r++) {
+        for (int a = 0; a < 360; a += 15) {
+            double rad = a * M_PI / 180.0;
+            int x = CENTRO_X + int(r * cos(rad) * 0.5);
+            int y = CENTRO_Y + int(r * sin(rad));
+            if (x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT)
+                canvas[y][x] = ".";
+        }
+    }
+
+    // se marca el centro con una "O"
+    canvas[CENTRO_Y][CENTRO_X] = "O";
+
+    // imprimo el canvas línea por línea
+    for (int i = 0; i < HEIGHT; i++) {
+        string linea = "";
+        for (int j = 0; j < WIDTH; j++) {
+            if (!canvas[i][j].empty()) linea += canvas[i][j];
+        }
+        cout << linea << "\n";
+    }
+}
+//funcion para poder pasar una cadena a minusculas
+string toLower(const string &s){
+    string res = s;
+    transform(res.begin(), res,end(), res.begin(), ::tolower);
+    return res;
+}
+
+
+// pide la apuesta y se valida, se repito si la entrada es inválida o si se apuesta más de lo que tienen
+int pedirApuesta(int saldo){
+ int apuesta;
+    while (true) {
+        cout << "¿Cuánto deseas apostar?: ";
+        if (cin >> apuesta) {
+            if (apuesta > 0 && apuesta <= saldo)
+                return apuesta;
+            else
+                cout << "Apuesta inválida. Debe ser mayor que 0 y no mayor que tu saldo.\n";
+        } else {
+            cout << "Entrada inválida. Ingresa un número entero.\n";
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
+    }    
+}
+
+
+// Pido el tipo de apuesta (número, color o par/impar) y valido que sea una opción válida
+string pedirTipoApuesta() {
+    string tipo;
+    while (true) {
+        cout << "\n╔════════════════════════════════════╗\n";
+        cout << "║         MENÚ DE APUESTAS          ║\n";
+        cout << "╠════════════════════════════════════╣\n";
+        cout << "║  1. Número exacto      →  paga 35x ║\n";
+        cout << "║  2. Color (Rojo/Negro) →  paga 2x  ║\n";
+        cout << "║  3. Par o Impar        →  paga 2x  ║\n";
+        cout << "╚════════════════════════════════════╝\n";
+        cout << "→ Escoge una opción: ";
+        cin >> tipo;
+        tipo = toLower(tipo);
+
+        if(tipo == "1" || tipo == "2" || tipo == "3")
+           return tipo;
+        else 
+            cout << "Opcion invalida, intenta de nuevo.\n"; 
+    }
+}
