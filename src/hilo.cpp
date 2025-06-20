@@ -8,19 +8,47 @@
 
 using namespace std;
 
-//function to show the card
-void ShowCard(int card) {
-    if (card == 1) cout << "[A]";
-    else if (card == 11) cout << "[J]";
-    else if (card == 12) cout << "[Q]";
-    else if (card == 13) cout << "[K]";
-    else cout << "[" << card << "]";
-}
-
 //bring a random number between 1 - 13
 int RandomCard() {
     return rand() % 13 + 1;
 }
+
+string RandomSuit() {
+    string suit[] = {"♠", "♥", "♦", "♣"};
+    return suit[rand() % 4];
+}
+
+//change the card value to string
+string CardValue(int value) {
+    if (value == 1) return "A";
+    if (value == 11) return "J";
+    if (value == 12) return "Q";
+    if (value == 13) return "K";
+    return to_string(value);
+}
+
+//makes a visual draw of the card
+void AsciiHiloCards(int value[], string suit[], int count) {
+    string line[7];
+    for (int i = 0; i < count; i++) {
+        string value2 = CardValue(value[i]);
+        string izq = value2.length() == 1 ? value2 + " " : value2;
+        string der = value2.length() == 1 ? " " + value2 : value2;
+
+        line[0] += "┌─────────┐ ";
+        line[1] += "│" + izq + "       │ ";
+        line[2] += "│         │ ";
+        line[3] += "│    " + suit[i] + "    │ ";
+        line[4] += "│         │ ";
+        line[5] += "│       " + der + "│ ";
+        line[6] += "└─────────┘ ";
+    }
+
+    for (int i = 0; i < 7; i++) {
+        cout << line[i] << endl;
+    }
+}
+
 
 
 //HILO game
@@ -28,21 +56,31 @@ void hilo(int& bet, int& balance){
     int card = RandomCard();
     char guess, going;
     bool keep = true;
+    string suit1 = RandomSuit();
 
     //Show the first card to start de game
     cout << "the first card is: \n";
-    ShowCard(card);
+    int values1[] = {card};
+    string suits1[] = {suit1};
+    AsciiHiloCards(values1, suits1, 1);
     cout << "\n";
     while (keep == true)
     {
         //generate a random "card2" in each loop
         int card2 = RandomCard();
+        string suit2 = RandomSuit();
 
+        //the player try to guess 
         cout << "The next card will be Higher (H) or Lower (L) \n";
         cin >> guess;
-        cout << "The next card is: ";
-        ShowCard(card2);
+        //show the next card
+        cout << "The next card is: \n";
+        int values2[] = {card2};
+        string suits2[] = {suit2};
+        AsciiHiloCards(values2, suits2, 1);
         cout << endl;
+
+        //verify if the answer was correct
         if ((guess == 'H' || guess == 'h') && card < card2 ||
             (guess == 'L' || guess == 'l') && card > card2)
         {
