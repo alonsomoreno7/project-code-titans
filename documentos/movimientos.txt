@@ -1,2 +1,2 @@
-Jugador: marcos | Evento: Depósito | Cantidad: $400 | Dinero restante: $400
 Jugador: alonso | Evento: Depósito | Cantidad: $400 | Dinero restante: $400
+Jugador: carlos | Evento: Depósito | Cantidad: $50 | Dinero restante: $50

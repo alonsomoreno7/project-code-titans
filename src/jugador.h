@@ -9,6 +9,7 @@
 #include <ctime>     // Para usar time() y así inicializar rand()
 #include <limits>    // Para limpiar buffer con cin.ignore()
 #include <windows.h>
+#include "hilo.h"
 
 using namespace std;
 
@@ -41,28 +42,126 @@ string trim(const string& str) {
     return str.substr(first, (last - first + 1));
 }
 
+// Esta función la hice para "normalizar" un texto, es decir, eliminar espacios y poner todo en minúsculas.
+// Me sirve para comparar nombres sin que importe si el usuario usó mayúsculas o dejó espacios.
+string normalizar(const string& texto) {
+    string limpio; // Aquí voy guardando el texto ya limpio
 
+    for (char c : texto) {
+        // Recorro cada carácter del texto original
+        if (!isspace(c)) // Si el carácter NO es un espacio...
+            limpio += tolower(c); // ... lo convierto a minúscula y lo agrego al string limpio
+    }
+
+    // Al final devuelvo el texto ya procesado, sin espacios ni mayúsculas
+    return limpio;
+}
 
 // ----------- Gestión de usuarios -----------
 
 // Verifico si el usuario ya está registrado en el archivo usuarios.txt
+// Esta función me sirve para verificar si ya existe un usuario con el mismo nombre
 bool existeUsuario(const string& nombre) {
-    ifstream archivo("usuarios.txt");
+    ifstream archivo("./documentos/usuarios.txt");
     if (!archivo.is_open()) return false;  // Si no puedo abrir el archivo, asumo que no existe usuario
 
     string linea;
+    string nombreNormalizado = normalizar(nombre);  // Normalizo el nombre que busco
+
     while (getline(archivo, linea)) {
-        if (linea == nombre) return true;  // Si encuentro el nombre en alguna línea, ya existe
-        // Ignoro las siguientes 2 líneas (contraseña y código) porque cada usuario ocupa 3 líneas
-        getline(archivo, linea);
-        getline(archivo, linea);
+        if (linea == "=== Usuario ===") {
+            getline(archivo, linea);
+            string nombreArchivo = linea.substr(8);  // Quito "Nombre: "
+            string nombreArchivoNorm = normalizar(nombreArchivo);  // Normalizo nombre del archivo
+
+            // Si coinciden los nombres normalizados, ya existe el usuario
+            if (nombreArchivoNorm == nombreNormalizado) return true;
+
+            // Ignoro las siguientes 2 líneas (contraseña y código) porque cada usuario ocupa 3 líneas
+            getline(archivo, linea);
+            getline(archivo, linea);
+        }
     }
     return false;  // No encontré el usuario
 }
 
+// Función para eliminar un usuario verificando su código de recuperación
+// Esta función elimina un usuario del archivo, solo si el nombre y el código coinciden.
+// Yo me aseguro de comparar los datos de manera normalizada para evitar errores por mayúsculas o espacios.
+void eliminarUsuario() {
+    // Abro el archivo original y el archivo temporal donde escribiré los datos filtrados
+    ifstream archivo("./documentos/usuarios.txt");
+    ofstream temp("./documentos/temp.txt");
+
+    // Pido los datos al usuario
+    string nombre, codigo;
+    cout << "Ingrese nombre de usuario a eliminar: ";
+    getline(cin, nombre);
+    cout << "Ingrese código de recuperación: ";
+    getline(cin, codigo);
+
+    // Normalizo lo que el usuario escribió, para que no fallen las comparaciones por errores menores
+    string nombreInput = normalizar(nombre);
+    string codigoInput = normalizar(codigo);
+
+    bool eliminado = false;
+    string linea;
+
+    // Si los archivos se abrieron correctamente, procedo
+    if (archivo.is_open() && temp.is_open()) {
+        while (getline(archivo, linea)) {
+            if (linea == "=== Usuario ===") {
+                // Leo las siguientes líneas que contienen los datos del usuario
+                string bloqueCompleto = linea + "\n";
+
+                getline(archivo, linea);
+                bloqueCompleto += linea + "\n";
+                string nombreArchivo = trim(linea.substr(8));  // Quito "Nombre: "
+
+                getline(archivo, linea);
+                bloqueCompleto += linea + "\n";
+                string passArchivo = trim(linea.substr(13));  // Quito "Contraseña: "
+
+                getline(archivo, linea);
+                bloqueCompleto += linea + "\n";
+                string codigoArchivo = trim(linea.substr(8));  // Quito "Código: "
+
+                getline(archivo, linea); // Línea decorativa final
+                bloqueCompleto += linea + "\n\n";
+
+                // Comparo usando los valores normalizados
+                if (!eliminado && normalizar(nombreArchivo) == nombreInput && normalizar(codigoArchivo) == codigoInput) {
+                    eliminado = true;  // Encontré el usuario y no lo copio al archivo nuevo
+                    cout << "Usuario eliminado correctamente.\n";
+                } else {
+                    // Si no es el usuario que quiero eliminar, lo copio igual al archivo temporal
+                    temp << bloqueCompleto;
+                }
+            } else {
+                // Si no es parte de un bloque de usuario, copio normalmente
+                temp << linea << '\n';
+            }
+        }
+
+        archivo.close();
+        temp.close();
+
+        // Reemplazo el archivo original por el nuevo
+        remove("./documentos/usuarios.txt");
+        rename("./documentos/temp.txt", "./documentos/usuarios.txt");
+
+        // Si nunca marqué como eliminado, entonces no lo encontré
+        if (!eliminado) {
+            cout << "Usuario o código incorrecto, no se eliminó nada.\n";
+        }
+    } else {
+        cout << "Error al abrir archivos.\n";
+    }
+}
+
 // Guardo un nuevo usuario en usuarios.txt (nombre, contraseña y código de recuperación)
 void guardarUsuario(const string& nombre, const string& password, const string& codigo) {
-    ofstream archivo("usuarios.txt", ios::app);
+    ofstream archivo("./documentos/usuarios.txt", ios::app);
     if (archivo.is_open()) {
         archivo << "=== Usuario ===\n";
         archivo << "Nombre: " << nombre << "\n";
@@ -89,18 +188,21 @@ bool registrarUsuario() {
         cout << "Nombre de usuario: ";
         getline(cin, nombre);
 
+        // Valido que el nombre solo tenga letras y espacios (usando otra función que tengas).
         if (!nombreValido(nombre)) {
             cout << "Nombre inválido. Solo letras y espacios.\n";
-            continue;  // Vuelvo a pedir el nombre
+            continue;  // Si es inválido, pido de nuevo
         }
 
-        if (existeUsuario(nombre)) {
+        // Normalizo el nombre y verifico que no exista ya en el archivo.
+        if (existeUsuario(normalizar(nombre))) {
             cout << "Ese nombre ya está registrado. Intenta otro.\n";
             nombre.clear();
             continue;
         }
-    } while (nombre.empty());  // Mientras el nombre sea inválido o duplicado, sigo pidiendo
+    } while (nombre.empty());
 
+    // Si llego aquí, el nombre está bien y no está repetido.
     cout << "Crea una contraseña: ";
     getline(cin, password);
 
@@ -115,15 +217,14 @@ bool registrarUsuario() {
 
 // Inicio sesión pidiendo nombre y contraseña, verifico contra archivo usuarios.txt
 bool iniciarSesion(string& jugador) {
-    // Primero intento abrir el archivo donde están los usuarios
-    ifstream archivo("usuarios.txt");
+    // Primero intento abrir el archivo donde guardo los usuarios.
+    ifstream archivo("./documentos/usuarios.txt");
     if (!archivo.is_open()) {
-        // Si no puedo abrirlo, aviso y termino la función
         cout << "Error al abrir archivo de usuarios.\n";
         return false;
     }
 
-    // Le pido al usuario que ingrese su nombre y contraseña
+    // Pido al usuario su nombre y contraseña para iniciar sesión.
     string nombreIngresado, passIngresada;
     cout << "\n=== Iniciar sesión ===\n";
     cout << "Nombre de usuario: ";
@@ -131,78 +232,81 @@ bool iniciarSesion(string& jugador) {
     cout << "Contraseña: ";
     getline(cin, passIngresada);
 
+    // Normalizo el nombre ingresado para evitar problemas de mayúsculas y espacios.
+    string nombreIngresadoNorm = normalizar(nombreIngresado);
+
     string linea;
-    // Empiezo a leer el archivo línea por línea buscando la etiqueta "=== Usuario ==="
     while (getline(archivo, linea)) {
         if (linea == "=== Usuario ===") {
-            // Cuando encuentro esa etiqueta, sé que vienen los datos de un usuario
-            string nombreArchivo, passArchivo, codigoArchivo;
-
-            // Leo las siguientes líneas para obtener el nombre, contraseña y código
+            // Cuando encuentro la etiqueta, leo los datos del usuario.
             getline(archivo, linea);
-            nombreArchivo = linea.substr(8); // Quito "Nombre: " y me quedo con el nombre
+            string nombreArchivo = normalizar(trim(linea.substr(8)));
 
             getline(archivo, linea);
-            passArchivo = linea.substr(13); // Quito "Contraseña: " y guardo la contraseña
+            string passArchivo = trim(linea.substr(13));
 
             getline(archivo, linea);
-            codigoArchivo = linea.substr(8); // Quito "Código: " y guardo el código
+            getline(archivo, linea); // Línea decorativa, solo avanzo
 
-            // Leo la línea de cierre para avanzar
-            getline(archivo, linea);
-
-            // Comparo los datos que ingresó el usuario con los que acabo de leer
-            if (nombreArchivo == nombreIngresado && passArchivo == passIngresada) {
-                // Si coinciden, le doy la bienvenida y guardo su nombre en 'jugador'
+            // Comparo el nombre normalizado y la contraseña ingresada.
+            if (nombreArchivo == nombreIngresadoNorm && passArchivo == passIngresada) {
+                // Si coinciden, guardo el nombre real y doy la bienvenida.
                 jugador = nombreIngresado;
                 cout << "¡Bienvenido, " << jugador << "!\n";
-                return true; // Y retorno que todo salió bien
-            }
-        }
-    }
-
-    // Si llegué hasta aquí, significa que no encontré usuario con esos datos
-    cout << "Credenciales incorrectas.\n";
-    jugador.clear(); // Limpio el nombre por si acaso
-    return false; // Retorno que no se pudo iniciar sesión
-}
-
-// Aquí busco si existe un usuario con su respectivo código de recuperación
-// Si todo va bien, también recupero la contraseña original
-bool verificarCodigoRecuperacion(const string& nombre, const string& codigo, string& password) {
-    ifstream archivo("usuarios.txt");
-    if (!archivo.is_open()) return false; // Si el archivo no se puede abrir, regreso false.
-
-    string linea;
-    while (getline(archivo, linea)) {
-        if (linea == "=== Usuario ===") {
-            // Si llego aquí, empiezo a leer los datos del usuario
-            getline(archivo, linea);
-            string nombreArchivo = trim(linea.substr(8)); // Quito el "Nombre: "
-
-            getline(archivo, linea);
-            string passArchivo = trim(linea.substr(13)); // Quito el "Contraseña: "
-
-            getline(archivo, linea);
-            string codigoArchivo = trim(linea.substr(8)); // Quito el "Código: "
-
-            getline(archivo, linea); // Esta línea es solo decorativa, así que la ignoro
-
-            // Comparo el nombre y el código con los que recibí
-            if (nombreArchivo == nombre && codigoArchivo == codigo) {
-                password = passArchivo; // Guardo la contraseña si todo coincide
                 return true;
             }
         }
     }
-    return false; // Si no encuentro coincidencia, regreso false
+
+    // Si no encuentro coincidencia, aviso que las credenciales son incorrectas.
+    cout << "Credenciales incorrectas.\n";
+    jugador.clear();
+    return false;
+}
+
+
+// Aquí busco si existe un usuario con su respectivo código de recuperación
+// Si todo va bien, también recupero la contraseña original
+bool verificarCodigoRecuperacion(const string& nombre, const string& codigo, string& password) {
+    // Intento abrir el archivo para buscar el usuario y su código.
+    ifstream archivo("./documentos/usuarios.txt");
+    if (!archivo.is_open()) return false;
+
+    // Normalizo el nombre para comparar sin importar mayúsculas o espacios.
+    string nombreNorm = normalizar(nombre);
+
+    string linea;
+    while (getline(archivo, linea)) {
+        if (linea == "=== Usuario ===") {
+            // Leo la información de un usuario.
+            getline(archivo, linea);
+            string nombreArchivo = normalizar(trim(linea.substr(8)));
+
+            getline(archivo, linea);
+            string passArchivo = trim(linea.substr(13));
+
+            getline(archivo, linea);
+            string codigoArchivo = trim(linea.substr(8));
+
+            getline(archivo, linea); // Ignoro línea decorativa
+
+            // Comparo si el nombre y código coinciden.
+            if (nombreArchivo == nombreNorm && codigoArchivo == codigo) {
+                // Si sí, guardo la contraseña para devolverla.
+                password = passArchivo;
+                return true;
+            }
+        }
+    }
+    // Si no encuentro coincidencia, retorno falso.
+    return false;
 }
 
 // Esta función la hice para reemplazar la contraseña vieja con una nueva directamente en el archivo.
 // Uso un archivo temporal para ir copiando todo, y luego reemplazo el archivo original.
 void actualizarContrasena(const string& nombre, const string& nuevaPass) {
-    ifstream archivo("usuarios.txt");
-    ofstream temp("temp.txt");
+    ifstream archivo("./documentos/usuarios.txt");
+    ofstream temp("./documentos/temp.txt");
 
     string linea;
     while (getline(archivo, linea)) {
@@ -245,8 +349,8 @@ void actualizarContrasena(const string& nombre, const string& nuevaPass) {
     temp.close();
 
     // Borro el original y renombro el nuevo archivo como el principal
-    remove("usuarios.txt");
-    rename("temp.txt", "usuarios.txt");
+    remove("./documentos/usuarios.txt");
+    rename("./documentos/temp.txt", "./documentos/usuarios.txt");
 }
 
 
@@ -300,7 +404,7 @@ void recuperarContrasena() {
 
 // Registro movimientos de dinero en un archivo para historial general
 void guardarMovimiento(const string& tipoMovimiento, const string& jugador, int cantidad, int dineroRestante) {
-    ofstream archivo("movimientos.txt", ios::app);
+    ofstream archivo("./documentos/movimientos.txt", ios::app);
     if (archivo.is_open()) {
         archivo << "Jugador: " << jugador << " | Evento: " << tipoMovimiento
                 << " | Cantidad: $" << cantidad
@@ -310,7 +414,7 @@ void guardarMovimiento(const string& tipoMovimiento, const string& jugador, int 
 
 // Registro eventos de juegos en un archivo para historial general
 void guardarJuego(const string& tipoEvento, const string& jugador, int cantidad, int resultado, int dineroRestante) {
-    ofstream archivo("juegos.txt", ios::app);
+    ofstream archivo("./documentos/juegos.txt", ios::app);
     if (archivo.is_open()) {
         archivo << "Jugador: " << jugador << " | Evento: " << tipoEvento
                 << " | Cantidad: $" << cantidad
@@ -332,7 +436,7 @@ void registrarJuego(const string& nombreJuego, const string& jugador, int gananc
 
 // Guardo el saldo actual del jugador en un archivo exclusivo para evitar conflictos
 void guardarSaldo(const string& jugador, int dinero) {
-    ofstream archivo("saldo_" + jugador + ".txt");  // Archivo separado por jugador
+    ofstream archivo("./documentos/saldo_" + jugador + ".txt");  // Archivo separado por jugador
     if (archivo.is_open()) {
         archivo << dinero << "\n";
     }
@@ -340,7 +444,7 @@ void guardarSaldo(const string& jugador, int dinero) {
 
 // Cargo el saldo guardado para un jugador desde su archivo
 int cargarSaldo(const string& jugador) {
-    ifstream archivo("saldo_" + jugador + ".txt");
+    ifstream archivo("./documentos/saldo_" + jugador + ".txt");
     if (!archivo.is_open()) return 0;
 
     int dineroGuardado;
@@ -613,10 +717,11 @@ inline void mostrarMenu() {
     cout << "2) Retirar dinero\n";
     cout << "3) Ruleta\n";
     cout << "4) Blackjack\n";
-        cout << "5) Tragamonedas\n";
+    cout << "5) Tragamonedas\n";
     cout << "6) Craps (Dados)\n";
-    cout << "7) Mostrar historial\n";
-    cout << "8) Salir\n";
+    cout << "7) Hi-Lo\n";
+    cout << "8) Mostrar historial\n";
+    cout << "9) Salir\n";
 }
 
 // Función principal que maneja el ciclo del juego después de iniciar sesión
@@ -687,9 +792,15 @@ inline void iniciar(const string& nombreUsuario) {
                     cout << "Craps aún no implementado.\n"; // Placeholder
                 break;
             case 7:
-                jugador.mostrarHistorial();
+                if (jugador.dinero <= 0)
+                    cout << "No tienes saldo suficiente. Deposita para jugar.\n";
+                else
+                    PlayHilo(jugador.dinero);
                 break;
             case 8:
+                jugador.mostrarHistorial();
+                break;
+            case 9:
                 cout << "Gracias por jugar. ¡Hasta luego!\n";
                 jugando = false;
                 break;
@@ -712,7 +823,8 @@ inline void menuInicio() {
         cout << "1) Iniciar sesión\n";
         cout << "2) Registrarse\n";
         cout << "3) Recuperar contraseña\n";
-        cout << "4) Salir\n";
+        cout << "4) Eliminar usuario\n";   
+        cout << "5) Salir\n";
         cout << "==========================\n";
         cout << "Opción: ";
         int opcion;
@@ -737,6 +849,9 @@ inline void menuInicio() {
                 recuperarContrasena();
                 break;
             case 4:
+                eliminarUsuario();
+                break;
+            case 5:
                 cout << "Saliendo del programa...\n";
                 return;
             default:
