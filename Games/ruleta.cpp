@@ -124,7 +124,7 @@ void imprimirCanvas(int iluminado) {
 //funcion para poder pasar una cadena a minusculas
 string toLower(const string &s){
     string res = s;
-    transform(res.begin(), res,end(), res.begin(), ::tolower);
+    transform(res.begin(), res.end(), res.begin(), ::tolower);
     return res;
 }
 
@@ -148,7 +148,7 @@ int pedirApuesta(int saldo){
 }
 
 
-// Pido el tipo de apuesta (número, color o par/impar) y valido que sea una opción válida
+// pido el tipo de apuesta (número, color o par/impar) y se valida que sea una opción válida
 string pedirTipoApuesta() {
     string tipo;
     while (true) {
@@ -169,3 +169,40 @@ string pedirTipoApuesta() {
             cout << "Opcion invalida, intenta de nuevo.\n"; 
     }
 }
+
+//pide un numero del 0 al 36 para la apuesta a numero exacto
+int pedirNumero(){
+    int num;
+    while(true) {
+        cout << "Ingresa el número (0-36): ";
+        if (cin >> num){
+            if (num >= 0 && num <= 36)
+                return num;
+            else 
+            cout << "Número inválido. El número debe estar entre 0 y 36.\n";
+        } else {
+            cout << "Entrada inválida. Ingrese un número entero.\n";
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
+    
+    }
+}
+
+// se pide el color "rojo" o "negro", se convierte a mayusculas y valida que sea correcto
+char pedirColor(){
+    string color;
+    while (true){
+        cout << "Ingresa el color (Rojo / Negro): ";
+        cin >> color;
+        color = toLower(color);
+        if (color == "rojo")
+            return 'R';
+        else if (color == "negro")
+            return 'N';
+        else
+        cout << "Color inválido. Solo puede ingresar 'Rojo' o 'Negro'.\n";
+
+    }
+}
+
