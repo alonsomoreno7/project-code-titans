@@ -121,7 +121,39 @@ char randomSymbolE (){
     char symbol [3]= {'@','$','7'}; //arreglo con 3 simbolos
     int randomP = rand()%3; //variable para elegir un numero del 0 al 3
     return symbol[randomP]; //la funcion retornara un simbolo random
+}
 
+void symbolColorE(char slots[3]){
+    //Funcion para asignar un color diferente a cada simbolo
+    for(int i=0;i<3;i++){ //leer el arreglo de simbolos
+        switch(slots[i]){ //leer posisicion del arreglo
+            case '$': //asignar a '$' color azul
+            setColor(34);
+            cout<< slots[i];
+            resetColor(); 
+            cout<<"   | "<< "  ";
+            break;
+            case '7': //asignar a '7' color amarillo
+            setColor(33);
+            cout<< slots[i];
+            resetColor(); 
+            cout<<"   | "<< "  ";
+            break;
+            case '@': //asignar a '@' color magenta
+            setColor(35);
+            cout<< slots[i];
+            resetColor(); 
+            cout<<"   | "<< "  ";
+            break;
+            default:
+            setColor(36); //ante cualquier error se asignara color cian
+            cout<< slots[i];
+            resetColor(); 
+            cout<<"   | "<< "  ";
+            break;
+
+        }
+    }
 }
 
 void finalSlotsE (char slots[3]) {
@@ -134,18 +166,8 @@ void finalSlotsE (char slots[3]) {
     cout<<".   |       |       |       |    *"<< endl;
     //En esta linea se mostraran los simbolos aleatorios
     cout<<".   |   ";
-    setColor(33); //color amarillo
-    cout<< slots[0];
-    resetColor(); 
-    cout<<"   | "<< "  ";
-    setColor(33);  //color amarillo
-    cout<< slots[1];
-    resetColor(); 
-    cout<<"   | "<< "  ";
-    setColor(33); //color amarillo
-    cout<< slots[2];
-    resetColor(); 
-    cout<<"   |    |" <<endl;
+    symbolColorE(slots);
+    cout<<" |" <<endl;
     cout<<".   |       |       |       |    *"<< endl;
     cout<<".    -----------------------     |"<<endl;
     cout<<". . . . . . .* - * - * - * - * - *"<<endl;
@@ -172,7 +194,7 @@ void easyMode(){
 
         srand(time(0)); //aleatoriedad
         
-         for(int i=4;i>0;i--){ //bucle for que repite 5 veces cada tiro
+         for(int i=4;i>0;i--){ //bucle for que repite 4 veces cada tiro
 
             while(true){ //while infinito para mostrar al jugador los tiros restantes 
 
@@ -308,7 +330,40 @@ char randomSymbolM (){
     return symbol[randomP]; //la funcion retornara un simbolo random
 }
 
-void finalSlotsM (char slots[5]) {
+void symbolColorM(char slots[4]){
+    //Funcion para asignar un color diferente a cada simbolo
+    for(int i=0;i<4;i++){ //leer el arreglo de simbolos
+        switch(slots[i]){ //leer posisicion del arreglo
+            case '$': //asignar a '$' color azul
+            setColor(34);
+            cout<< slots[i];
+            resetColor(); 
+            cout<<"   | "<< "  ";
+            break;
+            case '7': //asignar a '7' color amarillo
+            setColor(33);
+            cout<< slots[i];
+            resetColor(); 
+            cout<<"   | "<< "  ";
+            break;
+            case '@': //asignar a '0' color magenta
+            setColor(35);
+            cout<< slots[i];
+            resetColor(); 
+            cout<<"   | "<< "  ";
+            break;
+            default:
+            setColor(36); //ante cualquier error se asignara color cian
+            cout<< slots[i];
+            resetColor(); 
+            cout<<"   | "<< "  ";
+            break;
+
+        }
+    }
+}
+
+void finalSlotsM (char slots[4]) {
     //Mostrar slots finales al jugador
     cout<<endl;
     cout<<"* - * - * - * - * - . . . . . . . . . . ."<<endl;
@@ -319,22 +374,8 @@ void finalSlotsM (char slots[5]) {
     cout<<".   |       |       |       |       |   ."<< endl;
     //En esta linea se mostraran los simbolos aleatorios
     cout<<".   |   ";
-    setColor(33); //color amarillo
-    cout<< slots[0];
-    resetColor(); 
-    cout<<"   | "<< "  ";
-    setColor(33);  //color amarillo
-    cout<< slots[1];
-    resetColor(); 
-    cout<<"   | "<< "  ";
-    setColor(33); //color amarillo
-    cout<< slots[2];
-    resetColor(); 
-    cout<<"   | "<< "  ";
-    setColor(33); //color amarillo
-    cout<< slots[3];
-    resetColor(); 
-    cout<<"   |   *" <<endl;
+    symbolColorM(slots);
+    cout<<"*" <<endl;
     cout<<".   |       |       |       |       |   |"<< endl;
     cout<<"*    -------------------------------    *"<<endl;
     cout<<".    | Pull the lever (!)|              |"<<endl;
@@ -461,10 +502,45 @@ void mediumMode(){
         if(anotherRound=="N"||anotherRound=="n"){ //validar si el juegador eligio si o no
             break; //si el usuario ingreso "N" o "n" (no) la funcion termina
         }
-
     }
-
 }
+
+//                                           HARD MODE
+
+void symbolColorH(char slots[5]){
+    //Funcion para asignar un color diferente a cada simbolo
+    for(int i=0;i<5;i++){ //leer el arreglo de simbolos
+        switch(slots[i]){ //leer posisicion del arreglo
+            case '$': //asignar a '$' color azul
+            setColor(34);
+            cout<< slots[i];
+            resetColor(); 
+            cout<<"   | "<< "  ";
+            break;
+            case '7': //asignar a '7' color amarillo
+            setColor(33);
+            cout<< slots[i];
+            resetColor(); 
+            cout<<"   | "<< "  ";
+            break;
+            case '0': //asignar a '0' color magenta
+            setColor(35);
+            cout<< slots[i];
+            resetColor(); 
+            cout<<"   | "<< "  ";
+            break;
+            default:
+            setColor(36); //ante cualquier error se asignara color cian
+            cout<< slots[i];
+            resetColor(); 
+            cout<<"   | "<< "  ";
+            break;
+
+        }
+    }
+}
+
+
 
 
 //juego principal
