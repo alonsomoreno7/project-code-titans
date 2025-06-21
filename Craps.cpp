@@ -9,331 +9,447 @@
 
 using namespace std;
 
-// Caras ASCII de los dados
-const char *carasDados[6][5] = {
+// Array diceFaces that stores the ASCII representations of dice faces.
+// Each row represents one face of the die, from 1 to 6.
+// Each column contains a line of the ASCII drawing for that face.
+const char *diceFaces[6][5] = {
+
+    // Die face 1: one center dot
     {"+-------+", "|       |", "|   o   |", "|       |", "+-------+"},
+    // Die face 2: dots in opposite corners
     {"+-------+", "| o     |", "|       |", "|     o |", "+-------+"},
+    // Die face 3: dots in two corners and one in the center
     {"+-------+", "| o     |", "|   o   |", "|     o |", "+-------+"},
+    // Die face 4: dots in all four corners
     {"+-------+", "| o   o |", "|       |", "| o   o |", "+-------+"},
+    // Die face 5: dots in all four corners and one in the center
     {"+-------+", "| o   o |", "|   o   |", "| o   o |", "+-------+"},
+    // Die face 6: dots in all four corners and two in the middle lines (top and bottom)
     {"+-------+", "| o   o |", "| o   o |", "| o   o |", "+-------+"}};
 
-void mostrarDadosASCII(int d1, int d2)
+void clearScreen()
 {
-    for (int i = 0; i < 5; ++i)
-    {
-        cout << carasDados[d1 - 1][i] << "   " << carasDados[d2 - 1][i] << "\n";
-    }
-    cout << endl;
-}
+    // #ifdef checks if the macro is already defined, in this case _WIN32.
+    // _WIN32 lets us detect if the code is being compiled on Windows and executes the system("cls") command.
 
-void limpiarPantalla()
-{
 #ifdef _WIN32
+    // Executes the (cls) command to clear the console from the cpp file on Windows.
     system("cls");
 #else
+    // Executes the (clear) command to clear the console on operating systems like macOS, Linux, etc.
     system("clear");
 #endif
 }
 
-void esperarMilisegundos(int ms)
+// Function showASCIIDice. This function displays two dice side by side on the screen using drawings made with ASCII characters.
+void showASCIIDice(int d1, int d2)
 {
+    // It receives two numbers representing the dice (from 1 to 6) and prints them in the console so the player can clearly see them.
+    for (int i = 0; i < 5; ++i)
+    {
+        // To do this, it goes through each line of the drawing of each die and prints them together on the same line.
+        cout << diceFaces[d1 - 1][i] << "   " << diceFaces[d2 - 1][i] << "\n";
+    }
+    cout << endl;
+}
+
+// Function waitMilliseconds. Receives an integer parameter from the pause() function.
+void waitMilliseconds(int ms)
+{
+    // #ifdef checks if the macro is already defined, in this case _WIN32.
+    // _WIN32 lets us detect if the code is being compiled on Windows, then executes the Sleep() function.
 #ifdef _WIN32
+
+    // Performs a pause with the received parameter, converting milliseconds to seconds.
     Sleep(ms);
+
+    // If not Windows, executes usleep() for other operating systems.
 #else
+
     usleep(ms * 1000);
 #endif
 }
 
-void pausar()
+// Function pause. Temporarily stops execution for a few seconds to display validation messages to the user. Does not return any value.
+void pause()
 {
-    esperarMilisegundos(5000); // Espera 2 segundos sin necesidad de presionar nada
+    // Call the function waitMilliseconds() passing 3000, which equals 3 seconds of wait to show messages.
+    waitMilliseconds(3000);
 }
 
-int lanzarDadosAnimado()
+// Function rollDiceAnimated. This function simulates rolling two dice showing an animation in the console.
+int rollDiceAnimated()
 {
+    // Declare two variables for the dice and initialize them to 1.
     int d1 = 1, d2 = 1;
+
+    // Run a loop 10 times to simulate the animation.
     for (int i = 0; i < 10; ++i)
     {
+        // Generate random numbers between 1 and 6 for each die.
         d1 = rand() % 6 + 1;
         d2 = rand() % 6 + 1;
 
-        limpiarPantalla();
-        cout << "Lanzando dados...\n\n";
-        mostrarDadosASCII(d1, d2);
-        esperarMilisegundos(100);
+        // Clear the screen to show only the current animation frame.
+        clearScreen();
+
+        // Show the dice in ASCII with the generated values.
+        cout << "Rolling dice...\n\n";
+        showASCIIDice(d1, d2);
+
+        // Pause briefly to create the animation effect.
+        waitMilliseconds(100);
     }
 
-    cout << "Resultado final:\n\n";
-    mostrarDadosASCII(d1, d2);
+    // After the animation, show the final result message.
+    cout << "Final result:\n\n";
+
+    // Show the dice with the final values.
+    showASCIIDice(d1, d2);
+
+    // Return the sum of the values of both dice.
     return d1 + d2;
 }
 
-/* Función Jugabilidad , tipo int. Esta funcion tiene el objetivo de manipular toda la lógica del juego , lanzar los dados y verificar el número del
-lanzamiento mediante condicionales if , else if y también verificar que si el lanzamiento se convierte en un punto y luego se realizan lanzamientos
-hasta que el jugador obtenga el número ganador o el número perderdor o que se le acaben los intentos. */
-void MostrarMenu()
+// Function showMenu. A void function that simply displays the difficulty levels to the user.
+void showMenu()
 {
-
+    // Line break.
     cout << "\n";
+    // Message displayed to the user in the console.
     cout << "╔═══════════════════════════════════════════════════════════════════════╗\n";
-    cout << "║                       ♠ ♥ Bienvenido a Craps ♥ ♣                      ║\n";
+    cout << "║                       ♠ ♥ Welcome to Craps ♥ ♣                        ║\n";
     cout << "║                                                                       ║\n";
-    cout << "║            ¡Prepárate para probar tu suerte en este juego!            ║\n";
+    cout << "║            Get ready to test your luck in this game!                  ║\n";
     cout << "║                                                                       ║\n";
-    cout << "║          Selecciona el nivel de dificultad para comenzar:             ║\n";
+    cout << "║          Select the difficulty level to start:                        ║\n";
     cout << "║                                                                       ║\n";
-    cout << "║                  1. Fácil     ♣     2. Medio     ♦                    ║\n";
-    cout << "║                            3. Difícil     ♠                           ║\n";
+    cout << "║                  1. Easy     ♣     2. Medium     ♦                    ║\n";
+    cout << "║                            3. Hard       ♠                            ║\n";
     cout << "║                                                                       ║\n";
     cout << "╚═══════════════════════════════════════════════════════════════════════╝\n";
     cout << "\n";
 }
 
-int Validacion()
+// Function validateInput. It validates the user's input to ensure only values 1, 2, or 3 are accepted — no text or special characters.
+int validate()
 {
-    int opcion = 0;
-    cout << "Selecciona tu nivel de dificultad : \n";
-    cin >> opcion;
+    // Declare variable choice to store the player's input, initialized to 0 to avoid errors.
+    int choice = 0;
 
-    while (cin.fail() || cin.peek() != '\n' || opcion <= 0 || opcion > 3)
+    // Console message
+    cout << "Select your difficulty level: \n";
+    // Receive input value
+    cin >> choice;
+
+    /*
+       While loop verifies no values less than 1 or greater than 3 are received.
+       cin.fail(): checks if the input is an integer; triggers if input is char, string, etc.
+       cin.peek(): checks that the next character is '\n' to ensure only integer input.
+       cin.clear(): clears error flags in the input stream.
+       cin.ignore(1000, '\n'): removes remaining characters in the buffer to avoid garbage input.
+    */
+    while (cin.fail() || cin.peek() != '\n' || choice < 1 || choice > 3)
     {
         cin.clear();
         cin.ignore(1000, '\n');
 
         cout << "╔══════════════════════════════════════════════════════════════════════════════════════════════════════╗\n";
         cout << "║                                                                                                      ║\n";
-        cout << "║                                            ♠ ♥ Mensaje ♥ ♣                                           ║\n";
+        cout << "║                                            ♠ ♥ Message ♥ ♣                                           ║\n";
         cout << "║                                                                                                      ║\n";
-        cout << "║               Por favor no escriba letras ni caracteres especiales , solo numeros entre 1-3          ║\n";
+        cout << "║           Please do not enter letters or special characters, only numbers between 1 and 3            ║\n";
         cout << "║                                                                                                      ║\n";
-        cout << "║               Selecciona tu nivel de dificultad :                                                    ║\n";
+        cout << "║                     Select your difficulty level:                                                    ║\n";
         cout << "╚══════════════════════════════════════════════════════════════════════════════════════════════════════╝\n";
-        cin >> opcion;
+
+        // Read input again
+        cin >> choice;
     }
 
-    return opcion;
+    // Return validated integer (1, 2, or 3) to be used in the levels() function.
+    return choice;
 }
 
-int Jugabilidad(int intentosMaximos = 0)
+/* Function gameplay. This function handles all the game logic: rolling the dice and verifying the roll number
+   through if, else if conditionals. It also checks if the roll becomes a point, then continues rolling until
+   the player gets the winning number, the losing number, or runs out of attempts. */
+
+int gameplay(int maxAttempts = 0)
 {
-    string NuevaPartida;
+    string newGame;
     srand(time(0));
 
-    /*Variable come_out_roll , tipo int. Esta variable inicializada en 0 , es la encargada de guardar el número que el lanzador saque durante la primera
-    tirada de los dados. */
-    int come_out_roll = 0;
+    /* Variable comeOutRoll, type int. Initialized to 0, it stores the number rolled by the shooter on the first dice roll. */
+    int comeOutRoll = 0;
 
-    /*Variable point , tipo int. Esta variable inicializada en 0 , es la encargada de guardar el número que salga del lanzamiento siempre y cuando esta no
-    sea 2,3 , 12 , 7 o 11 , luego esta variable se utilizara para ser fijada y comnparada con las tiradas del lanzador . */
-    int punto = 0;
+    /* Variable point, type int. Initialized to 0, it stores the number rolled that is not 2, 3, 12, 7 or 11,
+       then is used to compare with subsequent rolls. */
+    int point = 0;
 
-    cout << "Iniciando el come-out roll...\n";
-    pausar();
+    cout << "Starting the come-out roll...\n";
+    pause();
 
-    /*El jugador inicia su primera tirada de dados , mandamos a llamar a la función lanzarDadosAnimados que es la encargada de generar un número aleatorio
-    que luego se asignara en la variable come_out_roll para ser verificada para ver que condiciones cumple la variable*/
-    come_out_roll = lanzarDadosAnimado();
+    /* The player starts the first dice roll; we call the rollDiceAnimated function, which generates a random number
+       assigned to comeOutRoll to be checked against game conditions. */
+    comeOutRoll = rollDiceAnimated();
 
-    cout << "El come-out roll es: " << come_out_roll << "\n";
+    cout << "The come-out roll is: " << comeOutRoll << "\n";
 
-    // Pausar pendiente
-    pausar();
+    pause();
 
-    // Verifica si la variable come_out_roll es 2 , 3 o 12 , si es asi entonces se le imprime un mensaje al jugador indicandole que perdió la partida.
-    if (come_out_roll == 2 || come_out_roll == 3 || come_out_roll == 12)
+    // Check if comeOutRoll is 2, 3, or 12; if so, print a losing message.
+    if (comeOutRoll == 2 || comeOutRoll == 3 || comeOutRoll == 12)
     {
-
-        // Mensaje que se mostrará en consola
         cout << "╔═══════════════════════════════════════════════════╗\n";
-        cout << "║                 ♠ ♥ Perdiste ♥ ♣                  ║\n";
+        cout << "║                 ♠ ♥ You Lost ♥ ♣                  ║\n";
         cout << "║                                                   ║\n";
-        cout << "║ Se ha generado un craps , has perdido la partida  ║\n";
+        cout << "║           Craps! You lost the game.               ║\n";
         cout << "║                                                   ║\n";
         cout << "╚═══════════════════════════════════════════════════╝\n";
+        pause();
+        clearScreen();
     }
-
-    // Verifica si la variable come_out_roll es igual a 7 o 12 , entonces el jugador gana en la primer ronda.
-    else if (come_out_roll == 7 || come_out_roll == 11)
+    // Check if comeOutRoll is 7 or 11; if so, player wins immediately.
+    else if (comeOutRoll == 7 || comeOutRoll == 11)
     {
-        // Mensaje que le mostramos al jugador en consola.
         cout << "╔═══════════════════════════════════════════════╗\n";
-        cout << "║                 ♠ ♥ Ganaste ♥ ♣               ║\n";
+        cout << "║                 ♠ ♥ You Won ♥ ♣               ║\n";
         cout << "║                                               ║\n";
-        cout << "║        Felicidades , has ganado  la ronda     ║\n";
+        cout << "║     Congratulations, you won the round!       ║\n";
         cout << "║                                               ║\n";
         cout << "╚═══════════════════════════════════════════════╝\n";
+        pause();
+        clearScreen();
     }
-
-    // Verificamos si la variable es igual a 4,5,6,8,9,10 entonces aqui se establece el punto.
-    else if (come_out_roll == 4 || come_out_roll == 5 || come_out_roll == 6 || come_out_roll == 8 || come_out_roll == 9 || come_out_roll == 10)
+    // Check if comeOutRoll is 4,5,6,8,9,10 to set the point.
+    else if (comeOutRoll == 4 || comeOutRoll == 5 || comeOutRoll == 6 || comeOutRoll == 8 || comeOutRoll == 9 || comeOutRoll == 10)
     {
-        // Le indicamos al usuario que se ha establecido un punto , aqui el jugador podrá realizar varios lanzamientos hasta que el come_out_roll sea el punto o 7.
-        cout << "Este es el punto , aqui el shooter generara de nuevo un come-out roll ... \n";
-        cout << "Si sale : " << come_out_roll << " entonces el shooter gana , si sale 7 entonce el shooter pierde \n";
+        cout << "╔═════════════════════════════════════════════════════════════════════════════════════════════════════════════╗\n";
+        cout << "║                                                                                                             ║\n";
+        cout << "║                                            ♠ ♥ Message ♥ ♣                                                  ║\n";
+        cout << "║                                                                                                             ║\n";
+        cout << "║                              The point is set, the shooter will roll again...                               ║\n";
+        cout << "║                                                                                                             ║\n";
+        cout << "║                                                                                                             ║\n";
+        cout << "║                      If the roll is: " << comeOutRoll << ", the shooter wins; if it's 7, the shooter loses                      ║\n";
+        cout << "╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════╝\n";
 
-        /*Esta variable point guardara el valor del primer lanzamiento (come_out_roll) a partir de aqui esta variable funcionara para comparar con cada nuevo lanzamiento
-        que realiza el jugador.*/
-        punto = come_out_roll;
-        pausar();
+        // Set the point value for comparison in subsequent rolls.
+        point = comeOutRoll;
+        pause();
 
-        /*Declaramos la variable intentos , tipo int. Inicializada en 0 , esta variable tendrá la funcionalidad de guardar las veces que el jugador lanza el dado
-        dado que existen niveles de dificultad nos funcionará para indicarle al juego cuando se le acaben los lanzamientos al tirador y cerrar el juego o decirle si desea seguir jugando. */
-        int intentos = 0;
+        /* Declare attempts variable, int type, initialized to 0. It counts the number of rolls the player makes.
+           This is used to control the number of rolls according to difficulty level, ending the game or prompting
+           if the player wants to continue when attempts are exhausted. */
+        int attempts = 0;
 
-        // Bucle While. Contiene dos condiciones diferentes que se estan comparando.
-
-        /*Condición 1. Compara si intentosMaximos (parametro que recibe la función al inicio) es igual a 0 con el objetivo
-        de que si el jugador selecciona el nivel facil entonces no tenga limite de lanzamientos. */
-
-        /*Condición 2. Compara si intentosMaximos es menor a intentos dado que nos permitira controlar cuando el jugador seleccione el nivel medio o dificil
-        entonces se repetira hasta que el jugador supere el máximo de intentos dependiendo la dificultad entonces el bucle deja de cumplirse y el jugador pierde la partida. */
-        while (intentosMaximos == 0 || intentos < intentosMaximos)
+        // While loop with two conditions:
+        // Condition 1: if maxAttempts == 0, meaning unlimited attempts (easy level).
+        // Condition 2: if attempts < maxAttempts, limiting attempts for medium or hard levels.
+        while (maxAttempts == 0 || attempts < maxAttempts)
         {
+            // Increment attempts count for each roll.
+            attempts++;
 
-            /*Variable intentos , es una variable que utilizamos como contador , la cual aumenta a medida el tirador realiza cada lanzamiento de dados ,
-             luego la vamos a comparar para saber si esta aun sigue siendo menor o si es mayor a intentosMaximos. */
-            intentos++;
+            // Player rolls the dice again; assign new roll to comeOutRoll to compare with point.
+            comeOutRoll = rollDiceAnimated();
 
-            /*El jugador realiza un nuevo lanzamiento de dados y ese nuevo lanzamiento lo guardamos en la variable come_out_roll y la vamos a comparar con
-            la variable point.*/
-            come_out_roll = lanzarDadosAnimado();
+            cout << "Attempt #" << attempts << endl;
+            cout << "The new come-out roll is: " << comeOutRoll << "\n";
 
-            // Le mostramos por mensaje en consola al jugador cuantos intentos a realizado.
-            cout << "Intento:#" << intentos << endl;
+            pause();
 
-            // Le mostramos en la consola al jugador cual es su nuevo lanzamiento resultado de realizar una nueva tirada de dados.
-            cout << "El nuevo come-out roll es : " << come_out_roll << "\n";
-
-            pausar();
-
-            // Con la condicional if verificamos si el nuevo lanzamiento del jugador es igual al punto entonces el jugador gana.
-            if (come_out_roll == punto)
+            // If roll equals the point, player wins.
+            if (comeOutRoll == point)
             {
-                // Le mostramos un mensaje de felicitación al jugador.
                 cout << "╔═════════════════════════════════════════════════════╗\n";
-                cout << "║                    ♠ ♥ Ganaste ♥ ♣                  ║\n";
+                cout << "║                    ♠ ♥ You Won ♥ ♣                  ║\n";
                 cout << "║                                                     ║\n";
-                cout << "║                Felicidades , has ganado             ║\n";
+                cout << "║                Congratulations, you won!            ║\n";
                 cout << "║                                                     ║\n";
                 cout << "╚═════════════════════════════════════════════════════╝\n";
+                pause();
+                clearScreen();
                 return 0;
             }
-
-            // Else if verificamos si el nuevo lanzamiento del jugador es igual a 7 entonces el jugador pierde.
-            else if (come_out_roll == 7)
+            // If roll is 7, player loses.
+            else if (comeOutRoll == 7)
             {
-                // Le mostramos un mensaje al jugador el mensaje que ha perdido.
                 cout << "╔═════════════════════════════════════════════════════╗\n";
-                cout << "║                   ♠ ♥ Perdiste ♥ ♣                  ║\n";
+                cout << "║                   ♠ ♥ You Lost ♥ ♣                  ║\n";
                 cout << "║                                                     ║\n";
-                cout << "║               Lo sentimos , has perdido             ║\n";
+                cout << "║               Sorry, you lost the game.             ║\n";
                 cout << "║                                                     ║\n";
                 cout << "╚═════════════════════════════════════════════════════╝\n";
-                pausar();
-                limpiarPantalla();
-
+                pause();
+                clearScreen();
                 return 0;
             }
         }
 
-        // Le mostramos por consola al jugador indicando que ya no tiene intentos , por lo tanto pierde.
+        // If attempts exhausted, player loses.
         cout << "╔═══════════════════════════════════════════════════╗\n";
-        cout << "║                  ♠ ♥ Mensaje ♥ ♣                  ║\n";
+        cout << "║                  ♠ ♥ Message ♥ ♣                  ║\n";
         cout << "║                                                   ║\n";
-        cout << "║   Lo sentimos , ya se te acabaron los intentos    ║\n";
+        cout << "║       Sorry, you have run out of attempts.        ║\n";
         cout << "║                                                   ║\n";
         cout << "╚═══════════════════════════════════════════════════╝\n";
 
-        pausar();
-        limpiarPantalla();
+        pause();
+        clearScreen();
     }
 }
 
-int Niveles(int seleccion)
+/* Function levels. This function handles the logic of selecting difficulty levels through a switch statement.
+There are three cases: (easy, medium, hard). Depending on the selection, we receive the parameter and validate it accordingly. */
+int levels(int selection)
 {
-    switch (seleccion)
+    switch (selection)
     {
+
+    // If the player selects the easy level, the player has no limit on attempts until they win or lose.
     case 1:
-        cout << "Has accedido al nivel facil \n";
-        Jugabilidad();
+        cout << "You have selected the easy level \n";
+
+        // Call the gameplay function; here MaxAttempts is declared as 0 to indicate unlimited attempts, so no parameter is passed.
+        gameplay();
+
+        // Break the switch if this level is selected.
         break;
 
     case 2:
         cout << "╔══════════════════════════════════════════════════════════════════════════════════════════════════════╗\n";
         cout << "║                                                                                                      ║\n";
-        cout << "║                                            ♠ ♥ Mensaje ♥ ♣                                           ║\n";
+        cout << "║                                            ♠ ♥ Message ♥ ♣                                           ║\n";
         cout << "║                                                                                                      ║\n";
-        cout << "║   Has accedido al nivel medio , tienes 5 intentos para lanzar los datos lograr el come-out roll      ║\n";
+        cout << "║   You have selected the medium level, you have 5 attempts to roll the dice and get the come-out roll ║\n";
         cout << "║                                                                                                      ║\n";
         cout << "╚══════════════════════════════════════════════════════════════════════════════════════════════════════╝\n";
 
-        Jugabilidad(5);
+        /* Call the gameplay function again but this time with a parameter of 5,
+           which sets MaxAttempts = 5, and then it will evaluate the attempts until the condition is no longer met. */
+        gameplay(5);
 
+        // Break the switch if this level is selected.
         break;
 
     case 3:
         cout << "╔══════════════════════════════════════════════════════════════════════════════════════════════════════╗\n";
         cout << "║                                                                                                      ║\n";
-        cout << "║                                            ♠ ♥ Mensaje ♥ ♣                                           ║\n";
+        cout << "║                                            ♠ ♥ Message ♥ ♣                                           ║\n";
         cout << "║                                                                                                      ║\n";
-        cout << "║   Has accedido al nivel medio , tienes 3 intentos para lanzar los datos lograr el come-out roll      ║\n";
+        cout << "║   You have selected the hard level, you have 3 attempts to roll the dice and get the come-out roll   ║\n";
         cout << "║                                                                                                      ║\n";
         cout << "╚══════════════════════════════════════════════════════════════════════════════════════════════════════╝\n";
-        Jugabilidad(3);
 
+        /* Apply the same logic as the previous case but with a parameter of 3,
+           which sets MaxAttempts = 3, and then evaluates attempts until the condition is no longer met. */
+        gameplay(3);
+
+        // Break the switch if this level is selected.
         break;
 
     default:
-        cout << "Opcion invalida ... \n";
+        cout << "Invalid option ... \n";
         break;
     }
 }
 
-void ReiniciarPartida()
+/* Function RestartGame. Its purpose is to display a message in the console to the player whether they win or lose,
+we indicate if they want to continue playing dice or return to the main menu where there are other games and mini-games. */
+void restartGame()
 {
-    string continuarPartida = "";
+
+    // Declare the variable continuePlaying of type string to store the player's decision.
+    string continuePlaying;
+
+    /* We use a do-while to display the message in the console and to receive and store the variable value
+    as long as the condition is met. It also allows us to validate if the player is entering an invalid
+    parameter that is not Y/N or y/n. */
     do
     {
 
+        // Display the message to the player
         cout << "╔═══════════════════════════════════════════════════╗\n";
-        cout << "║                ¿Desea seguir jugando?             ║\n";
+        cout << "║                Do you want to keep playing?       ║\n";
         cout << "║                                                   ║\n";
-        cout << "║   Si (S)                               No (N)     ║\n";
+        cout << "║   Yes (Y)                             No (N)      ║\n";
         cout << "║                                                   ║\n";
         cout << "╚═══════════════════════════════════════════════════╝\n";
-        cin >> continuarPartida;
 
-        if (continuarPartida == "S" || continuarPartida == "s")
+        // Receive the player's decision and store it in continuePlaying.
+        cin >> continuePlaying;
+
+        // Verify that the player enters Y or y; if so, show the menu again.
+        if (continuePlaying == "Y" || continuePlaying == "y")
         {
-            int seleccion = 0;
-            limpiarPantalla();
-            MostrarMenu();
-            seleccion = Validacion();
-            Niveles(seleccion);
+            // Reset the variable selection to 0 to ensure it doesn't keep previous values.
+            int selection = 0;
+
+            // Call the clearScreen function to give the player a better experience.
+            clearScreen();
+
+            // Again, use the showMenu() function to display difficulty levels to the player.
+            showMenu();
+
+            // In the validation method, receive the player's option (1, 2 or 3) and assign it to the selection variable.
+            selection = validate();
+
+            // The levels function receives the selection variable, enters a switch, evaluates the case depending on
+            // the level selected by the player, and then executes the gameplay function again.
+            levels(selection);
         }
-        else if (continuarPartida == "N" || continuarPartida == "n")
+
+        // Check with else if if the player enters N/n, then they want to return to the main menu where other games are.
+        else if (continuePlaying == "N" || continuePlaying == "n")
         {
-            cout << " Retornando al menú principal ... \n";
+            cout << " Returning to the main menu... \n";
+
+            // Return an exit.
             return;
         }
+
+        // Using else, validate if none of the previous conditions are met. That means the player entered an invalid
+        // value such as special characters, other numbers, or even text.
         else
         {
-            cout << "Ingrese un valor valido , por favor \n";
+            cout << "Please enter a valid value: \n";
         }
 
-    } while (continuarPartida != "N" && continuarPartida != "n");
+        // Pause to display the message
+        pause();
+
+        cin.clear();
+        // Clear the screen for a better player experience.
+        clearScreen();
+
+        // Repeat while the player hasn't chosen to exit
+    } while (continuePlaying != "N" && continuePlaying != "n");
 }
+
 int main()
 {
+
+    // UTF-8 encoding is a type of encoding that converts special characters so they can be read by computers.
+    // SetConsoleOutputCP is a function that allows displaying special characters, ASCII, UNICODE in the console using UTF-8 encoding.
     SetConsoleOutputCP(CP_UTF8);
 
-    int seleccion = 0;
-    limpiarPantalla();
-    MostrarMenu();
-    seleccion = Validacion();
-    Niveles(seleccion);
-    ReiniciarPartida();
+    // Initialize the variable selection to 0 to ensure no previous values are stored.
+    int selection = 0;
 
-    return 0;
+    // Call the clearScreen function to provide a better experience for the player.
+    clearScreen();
+
+    // Show the difficulty level menu to the player.
+    showMenu();
+
+    // Receive the player's option (1, 2, or 3).
+    selection = validate();
+
+    // Send the selection variable as a parameter.
+    levels(selection);
+
+    // Call the restartGame function to check if the player wants to continue playing or exit.
+    restartGame();
 }
