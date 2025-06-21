@@ -232,3 +232,52 @@ bool preguntarSeguir() {
         else cout << "Respuesta inválida. Por favor, responde 'sí' o 'no'.\n";
     }
 }
+int main() {
+    srand(time(nullptr)); // Inicio la semilla aleatoria para que cambien los numeros
+    calcularPosiciones();  // se calcula donde se deben colocar los numeros dentro de la ruleta
+
+    int saldo = 1000; // Inicio con 1000 de saldo para apostar
+
+    while (saldo > 0) {
+        limpiarConsola();
+        cout << "\nSaldo actual: $" << saldo << "\n";
+
+        // se pide apuesta al usuario validando que sea correcta
+        int apuesta = pedirApuesta(saldo);
+
+        // Pido qué tipo de apuesta quiere hacer
+        string tipo = pedirTipoApuesta();
+
+        int eleccion = -1;
+        string resumen;
+        char colorElegido = 0;
+        char paridadElegida = 0;
+
+        // Según el tipo pido más datos se arma un resumen para mostrarlo luego
+        if (tipo == "1") {
+            eleccion = pedirNumero();
+            resumen = "Apuesta: al número " + to_string(eleccion);
+        } else if (tipo == "2") {
+            colorElegido = pedirColor();
+            resumen = "Apuesta: al color " + string((colorElegido == 'R') ? "Rojo" : "Negro") + " | Monto: $" + to_string(apuesta);
+        } else { // tipo == "3"
+            paridadElegida = pedirParidad();
+            resumen = "Apuesta: a " + string((paridadElegida == 'P') ? "par" : "impar") + " | Monto: $" + to_string(apuesta);
+        }
+
+        cout << "\n" << resumen << "\nGirando la ruleta...\n";
+
+        // Genero un número ganador aleatorio y simulo el giro con un efecto de desaceleración
+        int ganador = rand() % NUMEROS;
+        int vueltas = 3;
+        int totalPasos = vueltas * NUMEROS + ganador;
+        int iluminado = 0;
+    }
+}    
+    
+
+
+        
+        
+
+
