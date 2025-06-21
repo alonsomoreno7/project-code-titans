@@ -205,4 +205,30 @@ char pedirColor(){
 
     }
 }
-
+//Se pide si la apuesta es a par o impar y valido la enntrada
+char pedirParidad() {
+    string paridad;
+    while (true) {
+        cout << "¿Par o Impar?: ";
+        cin >> paridad;
+        paridad = toLower(paridad);
+        if (paridad == "par")
+            return 'P';
+        else if (paridad == "impar")
+            return 'I';
+        else
+            cout << "Opción inválida. Solo 'Par' o 'Impar'.\n";
+    }
+}
+// Pregunto si el jugador quiere seguir jugando, acepta respuestas 
+bool preguntarSeguir() {
+    string resp;
+    while (true) {
+        cout << "\n¿Querés seguir jugando? (sí / no): ";
+        cin >> resp;
+        resp = toLower(resp);
+        if (resp == "si" || resp == "sí") return true;
+        else if (resp == "no") return false;
+        else cout << "Respuesta inválida. Por favor, responde 'sí' o 'no'.\n";
+    }
+}
