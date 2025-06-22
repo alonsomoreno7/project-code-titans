@@ -9,7 +9,9 @@
 #include <ctime>     // Para usar time() y así inicializar rand()
 #include <limits>    // Para limpiar buffer con cin.ignore()
 #include <windows.h>
+/*
 #include "hilo.h"
+*/
 #include "multijugador.h"
 
 using namespace std;
@@ -20,8 +22,6 @@ const int MAX_REGISTROS = 100;  // Defino un máximo de registros para el histor
 const int NORMAL = 2;
 const int MEDIO = 3;
 const int DIFICIL = 4;
-
-
 
 
 // ----------- Validación del nombre -----------//
@@ -256,6 +256,7 @@ bool iniciarSesion(string& jugador) {
                 // Si coinciden, guardo el nombre real y doy la bienvenida.
                 jugador = nombreIngresado;
                 cout << "¡Bienvenido, " << jugador << "!\n";
+                cout <<"=========================="<<"\n";
                 return true;
             }
         }
@@ -787,6 +788,7 @@ void jugarBlackjack() {
 
 // Mostrar las opciones disponibles para el usuario
 inline void mostrarMenu() {
+    cout <<"\n====================================";
     cout << "\nMenu Principal - Casino Virtual\n";
     cout << "1) Depositar dinero\n";
     cout << "2) Retirar dinero\n";
@@ -798,6 +800,7 @@ inline void mostrarMenu() {
     cout << "8) Mostrar historial\n";
      cout << "9) Mostrar estadísticas \n";
     cout << "10) Salir\n";
+    cout <<"====================================\n";
 }
 
 // Función principal que maneja el ciclo del juego después de iniciar sesión
@@ -868,12 +871,14 @@ inline void iniciar(const string& nombreUsuario) {
                 else
                     cout << "Craps aún no implementado.\n"; // Placeholder
                 break;
+                /*
             case 7:
                 if (jugador.dinero <= 0)
                     cout << "No tienes saldo suficiente. Deposita para jugar.\n";
                 else
                     PlayHilo(jugador.dinero);
                 break;
+                */
             case 8:
                 jugador.mostrarHistorial();
                 break;
@@ -990,7 +995,6 @@ inline void menuModoJuego() {
         }
     }
 }
-
 
 
 #endif // JUGADOR_H
