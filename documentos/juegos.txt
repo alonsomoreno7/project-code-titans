@@ -1,1 +1,14 @@
 Jugador: alonso | Evento: Blackjack | Cantidad: $200 | Resultado: Perdió | Dinero restante: $200
+Jugador: carlos | Evento: Blackjack | Cantidad: $4 | Resultado: Perdió | Dinero restante: $46
+Jugador: alonso | Evento: Blackjack | Cantidad: $2 | Resultado: Ganó | Dinero restante: $202
+Jugador: alonso | Evento: Blackjack | Cantidad: $40 | Resultado: Perdió | Dinero restante: $162
+Jugador: alonso | Evento: Blackjack | Cantidad: $0 | Resultado: Empate | Dinero restante: $162
+Jugador: alonso | Evento: Blackjack | Cantidad: $40 | Resultado: Ganó | Dinero restante: $202
+Jugador: alonso | Evento: Blackjack | Cantidad: $40 | Resultado: Ganó | Dinero restante: $242
+Jugador: alonso | Evento: Blackjack | Cantidad: $40 | Resultado: Perdió | Dinero restante: $202
+Jugador: alonso | Evento: Blackjack | Cantidad: $4 | Resultado: Perdió | Dinero restante: $198
+Jugador: alonso | Evento: Blackjack | Cantidad: $4 | Resultado: Perdió | Dinero restante: $194
+Jugador: alonso | Evento: Blackjack | Cantidad: $5 | Resultado: Perdió | Dinero restante: $189
+Jugador: alonso | Evento: Blackjack | Cantidad: $40 | Resultado: Perdió | Dinero restante: $149
+Jugador: alonso | Evento: Blackjack | Cantidad: $40 | Resultado: Ganó | Dinero restante: $189
+Jugador: alonso | Evento: Blackjack | Cantidad: $40 | Resultado: Perdió | Dinero restante: $149

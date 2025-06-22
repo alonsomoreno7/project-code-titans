@@ -10,6 +10,7 @@
 #include <limits>    // Para limpiar buffer con cin.ignore()
 #include <windows.h>
 #include "hilo.h"
+#include "multijugador.h"
 
 using namespace std;
 
@@ -19,6 +20,8 @@ const int MAX_REGISTROS = 100;  // Defino un máximo de registros para el histor
 const int NORMAL = 2;
 const int MEDIO = 3;
 const int DIFICIL = 4;
+
+
 
 
 // ----------- Validación del nombre -----------//
@@ -453,6 +456,39 @@ int cargarSaldo(const string& jugador) {
     return dineroGuardado;
 }
 
+// Agrega estas funciones auxiliares (pueden estar en la clase Jugador o como funciones libres)
+void guardarEstadisticas(const string& nombre, int jugadas, int ganadas, int perdidas, int empatadas) {
+    ofstream archivo("./documentos/estadisticas_" + nombre + ".txt");
+    if (archivo.is_open()) {
+        archivo << "Partidas jugadas: " << jugadas << "\n";
+        archivo << "Partidas ganadas: " << ganadas << "\n";
+        archivo << "Partidas perdidas: " << perdidas << "\n";
+        archivo << "Partidas empatadas: " << empatadas << "\n";
+        archivo.close();
+    }
+}
+
+bool cargarEstadisticas(const string& nombre, int& jugadas, int& ganadas, int& perdidas, int& empatadas) {
+    ifstream archivo("./documentos/estadisticas_" + nombre + ".txt");
+    if (!archivo.is_open()) return false;
+
+    string linea;
+    while (getline(archivo, linea)) {
+        if (linea.find("Partidas jugadas:") != string::npos) {
+            jugadas = stoi(linea.substr(linea.find(":") + 2));
+        } else if (linea.find("Partidas ganadas:") != string::npos) {
+            ganadas = stoi(linea.substr(linea.find(":") + 2));
+        } else if (linea.find("Partidas perdidas:") != string::npos) {
+            perdidas = stoi(linea.substr(linea.find(":") + 2));
+        } else if (linea.find("Partidas empatadas:") != string::npos) {
+            empatadas = stoi(linea.substr(linea.find(":") + 2));
+        }
+    }
+    archivo.close();
+    return true;
+}
+
+
 // ----------- Estructura Jugador -----------
 
 struct Registro {
@@ -464,6 +500,38 @@ struct Jugador {
     int dinero = 0;
     Registro historial[MAX_REGISTROS];
     int numRegistros = 0;
+
+    int partidasJugadas = 0;
+    int partidasGanadas = 0;
+    int partidasPerdidas = 0;
+    int partidasEmpatadas = 0;
+
+     void actualizarEstadisticas() {
+        guardarEstadisticas(nombre, partidasJugadas, partidasGanadas, partidasPerdidas, partidasEmpatadas);
+    }
+
+    void cargarEstadisticasJugador() {
+        int j, g, p, e;
+        if (cargarEstadisticas(nombre, j, g, p, e)) {
+            partidasJugadas = j;
+            partidasGanadas = g;
+            partidasPerdidas = p;
+            partidasEmpatadas = e;
+        }
+    }
+
+    // Actualiza el método mostrarEstadisticas
+ void mostrarEstadisticas() {
+    // Cargar estadísticas del jugador desde el archivo
+    cargarEstadisticasJugador();
+    
+    cout << "\nEstadísticas de Blackjack:\n";
+    cout << "Partidas jugadas: " << partidasJugadas << "\n";
+    cout << "Partidas ganadas: " << partidasGanadas << "\n";
+    cout << "Partidas perdidas: " << partidasPerdidas << "\n";
+    cout << "Partidas empatadas: " << partidasEmpatadas << "\n";
+}
+
 
     // Agrego un nuevo registro al historial si no está lleno
     void agregarRegistro(const string& texto) {
@@ -594,6 +662,8 @@ void jugarBlackjack() {
     cout << "Tu dinero actual es $" << dinero << ". Ingresa tu apuesta: $";
     cin >> apuesta;
 
+     partidasJugadas++;
+
     // Verifico si la apuesta es válida.
     if (cin.fail() || apuesta <= 0 || apuesta > dinero) {
         cin.clear(); cin.ignore(1000, '\n');
@@ -692,18 +762,23 @@ void jugarBlackjack() {
     if (puntajeDealer > 21 || puntajeJugador > puntajeDealer) {
         cout << "\n¡Ganaste!\n";
         dinero += apuesta;
+        partidasGanadas++;
         registrarJuego("Blackjack", nombre, apuesta, dinero);
     } else if (puntajeJugador == puntajeDealer) {
         cout << "\nEmpate. No ganas ni pierdes.\n";
         registrarJuego("Blackjack", nombre, 0, dinero);
+        partidasEmpatadas++; 
     } else {
         cout << "\nPerdiste.\n";
         dinero -= apuesta;
         registrarJuego("Blackjack", nombre, -apuesta, dinero);
+        partidasPerdidas++;
     }
 
     // Actualizo el saldo después de cada partida.
     guardarSaldo(nombre, dinero);
+    // Actualizo las estadísticas en el archivo
+    actualizarEstadisticas();
 }
 
 };
@@ -721,7 +796,8 @@ inline void mostrarMenu() {
     cout << "6) Craps (Dados)\n";
     cout << "7) Hi-Lo\n";
     cout << "8) Mostrar historial\n";
-    cout << "9) Salir\n";
+     cout << "9) Mostrar estadísticas \n";
+    cout << "10) Salir\n";
 }
 
 // Función principal que maneja el ciclo del juego después de iniciar sesión
@@ -729,6 +805,7 @@ inline void iniciar(const string& nombreUsuario) {
     Jugador jugador;
     jugador.nombre = nombreUsuario;
     jugador.dinero = cargarSaldo(nombreUsuario);
+    jugador.cargarEstadisticasJugador(); 
 
     cout << "Hola, " << jugador.nombre << "! Saldo actual: $" << jugador.dinero << "\n";
 
@@ -800,7 +877,10 @@ inline void iniciar(const string& nombreUsuario) {
             case 8:
                 jugador.mostrarHistorial();
                 break;
-            case 9:
+            case 9:  // Opción para mostrar estadísticas
+                jugador.mostrarEstadisticas();
+                break;
+            case 10:
                 cout << "Gracias por jugar. ¡Hasta luego!\n";
                 jugando = false;
                 break;
@@ -861,5 +941,56 @@ inline void menuInicio() {
 
     iniciar(nombre);  // Iniciar ciclo de juego después de login
 }
+
+// Este es el primer menú que muestro cuando se ejecuta el programa.
+// Aquí el jugador elige si quiere jugar solo o con otra persona de forma local.
+inline void menuModoJuego() {
+    int opcion;
+
+    while (true) {
+        // Muestro las opciones con un diseño claro
+        cout << "\n=========== MODO DE JUEGO ===========\n";
+        cout << "1) Jugar solo\n";
+        cout << "2) Multijugador local\n";
+        cout << "3) Salir del juego\n";
+        cout << "=====================================\n";
+        cout << "Escoge una opción: ";
+        cin >> opcion;
+
+        // Verifico si lo que ingresó es válido (que sea número)
+        if (cin.fail()) {
+            cin.clear(); // Limpio el error de cin
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Limpio el buffer
+            cout << "Entrada inválida. Ingresa un número del 1 al 3.\n";
+            continue;
+        }
+
+        // Limpio el buffer por si escribió algo más después del número
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+        switch (opcion) {
+            case 1:
+                // Si elige jugar solo, lo mando al menú de inicio (login, registro, etc.)
+                menuInicio(); 
+                return;
+
+            case 2:
+                // Si elige multijugador, llamo la función que maneja ese modo
+                modoMultijugador();
+                return;
+
+            case 3:
+                // Si decide salir, le doy un mensaje y termino
+                cout << "¡Gracias por jugar! Hasta pronto.\n";
+                return;
+
+            default:
+                // Si escribe un número fuera de 1-3, le aviso
+                cout << "Opción inválida. Intenta de nuevo.\n";
+        }
+    }
+}
+
+
 
 #endif // JUGADOR_H
