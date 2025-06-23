@@ -3,12 +3,14 @@
 
 #include <string>
 #include <fstream>
+#include <cmath>
 #include <iostream>
 #include <cctype>
 #include <cstdlib>   // Para usar rand()
 #include <ctime>     // Para usar time() y así inicializar rand()
 #include <limits>    // Para limpiar buffer con cin.ignore()
 #include <windows.h>
+#include <algorithm>
 /*
 #include "hilo.h"
 */
@@ -22,7 +24,6 @@ const int MAX_REGISTROS = 100;  // Defino un máximo de registros para el histor
 const int NORMAL = 2;
 const int MEDIO = 3;
 const int DIFICIL = 4;
-
 
 // ----------- Validación del nombre -----------//
 
@@ -577,7 +578,9 @@ struct Jugador {
             cout << (i + 1) << ") " << historial[i].descripcion << "\n";
     }
 
-    // ----------- Lógica del Blackjack -----------
+    // ----------- Lógica de la Ruleta ----------- //
+
+    // ----------- Lógica del Blackjack ----------- //
 
   int generarCarta() {
     // Genero un número aleatorio entre 1 y 13 para representar una carta.
@@ -651,25 +654,29 @@ int calcularPuntaje(int cartas[], int numCartas) {
     // Retorno el puntaje final.
     return suma;
 }
+
 void jugarBlackjack() {
     // Verifico si tengo dinero para jugar.
     if (dinero <= 0) {
         cout << "No tienes dinero para jugar Blackjack.\n";
         return;
     }
-
-    
     int apuesta;
-    cout << "Tu dinero actual es $" << dinero << ". Ingresa tu apuesta: $";
-    cin >> apuesta;
-
-     partidasJugadas++;
-
-    // Verifico si la apuesta es válida.
-    if (cin.fail() || apuesta <= 0 || apuesta > dinero) {
-        cin.clear(); cin.ignore(1000, '\n');
-        cout << "Apuesta inválida.\n";
-        return;
+    cout << "Tu dinero actual es $" << dinero << ". Ingresa tu apuesta (mínimo $10, máximo $500): $";
+    
+    while (true) {
+        cin >> apuesta;
+        // Verifico si la apuesta es válida.
+        if (cin.fail() || apuesta < 10 || apuesta > 500 || apuesta > dinero) {
+            cin.clear(); 
+            cin.ignore(1000, '\n');
+            cout << "Apuesta inválida. Debe ser entre $10 y $500 y no puede exceder tu saldo actual.\n";
+            cout << "Tu dinero actual es $" << dinero << ". Ingresa tu apuesta: $";
+            continue;
+        }
+        
+        // Acepto la apuesta válida
+        break;
     }
 
     // Elijo el nivel de dificultad.
@@ -782,6 +789,249 @@ void jugarBlackjack() {
     actualizarEstadisticas();
 }
 
+ //----------- Lógica del Craps ----------- //
+
+void jugarCraps() {
+    if (dinero <= 0) {
+        cout << "No tienes saldo suficiente. Deposita para jugar.\n";
+        return;
+    }
+
+    char jugarOtraVez;
+    do {
+        // Solicitar apuesta primero
+        int apuesta;
+        cout << "\nTu dinero actual es $" << dinero << ". Ingresa tu apuesta (mínimo $10, máximo $500): $";
+        
+        while (true) {
+            cin >> apuesta;
+
+            if (apuesta == 0) {
+                cout << "Apuesta cancelada.\n";
+                return;
+            }
+            
+            if (cin.fail() || apuesta < 10 || apuesta > 500) {
+                cin.clear();
+                cin.ignore(1000, '\n');
+                cout << "Apuesta inválida. Debe ser entre $10 y $500.\n";
+                cout << "Ingresa tu apuesta: $";
+                continue;
+            }
+            
+            if (apuesta > dinero) {
+                cout << "Saldo insuficiente. Tu saldo actual es $" << dinero << ".\n";
+                cout << "Ingresa tu apuesta: $";
+                continue;
+            }
+            
+            break;
+        }
+
+        // Mostrar menú de dificultad después de la apuesta
+        cout << "\n╔═══════════════════════════════════════════════════════════════════════╗\n";
+        cout << "║                       ♠ ♥ Welcome to Craps ♥ ♣                        ║\n";
+        cout << "║                                                                       ║\n";
+        cout << "║          Select the difficulty level to start:                        ║\n";
+        cout << "║                                                                       ║\n";
+        cout << "║                  1. Easy     ♣     2. Medium     ♦                    ║\n";
+        cout << "║                            3. Hard       ♠                            ║\n";
+        cout << "║                                                                       ║\n";
+        cout << "╚═══════════════════════════════════════════════════════════════════════╝\n";
+
+        int selection = validarEntradaCraps();
+        
+        partidasJugadas++;
+        
+        // Ejecutar la lógica del juego según la dificultad seleccionada
+        int resultado = 0;
+        switch (selection) {
+            case 1:
+                cout << "Has seleccionado el nivel fácil (intentos ilimitados)\n";
+                resultado = ejecutarJuegoCraps(0, apuesta);
+                break;
+            case 2:
+                cout << "Has seleccionado el nivel medio (5 intentos)\n";
+                resultado = ejecutarJuegoCraps(5, apuesta);
+                break;
+            case 3:
+                cout << "Has seleccionado el nivel difícil (3 intentos)\n";
+                resultado = ejecutarJuegoCraps(3, apuesta);
+                break;
+        }
+
+        dinero += resultado;
+        guardarSaldo(nombre, dinero);
+        actualizarEstadisticas();
+
+        // Preguntar si quiere jugar otra vez
+        cout << "\n¿Quieres jugar otra vez? (s/n): ";
+        cin >> jugarOtraVez;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        
+    } while (tolower(jugarOtraVez) == 's');
+}
+
+// Función auxiliar para validar entrada en Craps
+int validarEntradaCraps() {
+    int choice = 0;
+    cout << "Selecciona tu nivel de dificultad: ";
+    cin >> choice;
+
+    while (cin.fail() || cin.peek() != '\n' || choice < 1 || choice > 3) {
+        cin.clear();
+        cin.ignore(1000, '\n');
+        cout << "╔══════════════════════════════════════════════════════════════════════════════════════════════════════╗\n";
+        cout << "║                                                                                                      ║\n";
+        cout << "║                                            ♠ ♥ Message ♥ ♣                                           ║\n";
+        cout << "║                                                                                                      ║\n";
+        cout << "║           Please do not enter letters or special characters, only numbers between 1 and 3            ║\n";
+        cout << "║                                                                                                      ║\n";
+        cout << "║                     Select your difficulty level:                                                    ║\n";
+        cout << "╚══════════════════════════════════════════════════════════════════════════════════════════════════════╝\n";
+        cin >> choice;
+    }
+    return choice;
+}
+
+// Función principal que ejecuta el juego Craps
+int ejecutarJuegoCraps(int maxAttempts, int apuesta) {
+    cout << "Iniciando tirada inicial...\n";
+    Sleep(3000);
+
+    int comeOutRoll = lanzarDadosAnimado();
+    cout << "La tirada inicial es: " << comeOutRoll << "\n";
+    Sleep(3000);
+
+    if (comeOutRoll == 2 || comeOutRoll == 3 || comeOutRoll == 12) {
+        cout << "╔═══════════════════════════════════════════════════╗\n";
+        cout << "║                 ♠ ♥ You Lost ♥ ♣                  ║\n";
+        cout << "║                                                   ║\n";
+        cout << "║           Craps! You lost the game.               ║\n";
+        cout << "║                                                   ║\n";
+        cout << "╚═══════════════════════════════════════════════════╝\n";
+        registrarJuego("Craps", nombre, -apuesta, dinero - apuesta);
+        partidasPerdidas++;
+        return -apuesta;
+    }
+    else if (comeOutRoll == 7 || comeOutRoll == 11) {
+        cout << "╔═══════════════════════════════════════════════╗\n";
+        cout << "║                 ♠ ♥ You Won ♥ ♣               ║\n";
+        cout << "║                                               ║\n";
+        cout << "║     Congratulations, you won the round!       ║\n";
+        cout << "║                                               ║\n";
+        cout << "╚═══════════════════════════════════════════════╝\n";
+        registrarJuego("Craps", nombre, apuesta, dinero + apuesta);
+        partidasGanadas++;
+        return apuesta;
+    }
+    else {
+        int point = comeOutRoll;
+        cout << "╔═════════════════════════════════════════════════════════════════════════════════════════════════════════════╗\n";
+        cout << "║                                                                                                             ║\n";
+        cout << "║                                            ♠ ♥ Message ♥ ♣                                                  ║\n";
+        cout << "║                                                                                                             ║\n";
+        cout << "║                              The point is set, the shooter will roll again...                               ║\n";
+        cout << "║                                                                                                             ║\n";
+        cout << "║                                                                                                             ║\n";
+        cout << "║                      If the roll is: " << comeOutRoll << ", the shooter wins; if it's 7, the shooter loses                      ║\n";
+        cout << "╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════╝\n";
+        Sleep(3000);
+
+        int attempts = 0;
+        while (maxAttempts == 0 || attempts < maxAttempts) {
+            attempts++;
+            comeOutRoll = lanzarDadosAnimado();
+            cout << "Intento #" << attempts << endl;
+            cout << "La nueva tirada es: " << comeOutRoll << "\n";
+            Sleep(3000);
+
+            if (comeOutRoll == point) {
+                cout << "╔═════════════════════════════════════════════════════╗\n";
+                cout << "║                    ♠ ♥ You Won ♥ ♣                  ║\n";
+                cout << "║                                                     ║\n";
+                cout << "║                Congratulations, you won!            ║\n";
+                cout << "║                                                     ║\n";
+                cout << "╚═════════════════════════════════════════════════════╝\n";
+                registrarJuego("Craps", nombre, apuesta, dinero + apuesta);
+                partidasGanadas++;
+                return apuesta;
+            }
+            else if (comeOutRoll == 7) {
+                cout << "╔═════════════════════════════════════════════════════╗\n";
+                cout << "║                   ♠ ♥ You Lost ♥ ♣                  ║\n";
+                cout << "║                                                     ║\n";
+                cout << "║               Sorry, you lost the game.             ║\n";
+                cout << "║                                                     ║\n";
+                cout << "╚═════════════════════════════════════════════════════╝\n";
+                registrarJuego("Craps", nombre, -apuesta, dinero - apuesta);
+                partidasPerdidas++;
+                return -apuesta;
+            }
+        }
+
+        cout << "╔═══════════════════════════════════════════════════╗\n";
+        cout << "║                  ♠ ♥ Message ♥ ♣                  ║\n";
+        cout << "║                                                   ║\n";
+        cout << "║       Sorry, you have run out of attempts.        ║\n";
+        cout << "║                                                   ║\n";
+        cout << "╚═══════════════════════════════════════════════════╝\n";
+        registrarJuego("Craps", nombre, -apuesta, dinero - apuesta);
+        partidasPerdidas++;
+        return -apuesta;
+    }
+}
+
+// Función para mostrar dados en ASCII
+void mostrarDadosASCII(int d1, int d2) {
+    const char* diceFaces[6][5] = {
+    {"+-------+", "|       |", "|   o   |", "|       |", "+-------+"},
+    {"+-------+", "| o     |", "|       |", "|     o |", "+-------+"},
+    {"+-------+", "| o     |", "|   o   |", "|     o |", "+-------+"},
+    {"+-------+", "| o   o |", "|       |", "| o   o |", "+-------+"},
+    {"+-------+", "| o   o |", "|   o   |", "| o   o |", "+-------+"},
+    {"+-------+", "| o   o |", "| o   o |", "| o   o |", "+-------+"}
+    };
+
+    for (int i = 0; i < 5; ++i) {
+        cout << diceFaces[d1 - 1][i] << "   " << diceFaces[d2 - 1][i] << "\n";
+    }
+    cout << endl;
+}
+
+// Función para animación de lanzamiento de dados
+int lanzarDadosAnimado() {
+  int d1 = 1, d2 = 1;
+    
+    // Limpiar consola de forma compatible
+    #ifdef _WIN32
+        system("cls");
+    #else
+        system("clear");
+    #endif
+    
+    for (int i = 0; i < 10; ++i) {
+        d1 = rand() % 6 + 1;
+        d2 = rand() % 6 + 1;
+        
+        // Limpiar consola para cada frame de la animación
+        #ifdef _WIN32
+            system("cls");
+        #else
+            system("clear");
+        #endif
+        
+        cout << "Tirando dados...\n\n";
+        mostrarDadosASCII(d1, d2);
+        Sleep(100);
+    }
+    
+    // Mostrar resultado final
+    cout << "Resultado final:\n\n";
+    mostrarDadosASCII(d1, d2);
+    return d1 + d2;
+}
+
 };
 
 // ----------- Menú -----------
@@ -846,12 +1096,14 @@ inline void iniciar(const string& nombreUsuario) {
                 jugador.retirar(cantidad);
                 break;
             }
+            /*
             case 3:
                 if (jugador.dinero <= 0)
                     cout << "No tienes saldo suficiente. Deposita para jugar.\n";
                 else
-                    cout << "Ruleta aún no implementada.\n"; // Placeholder
+                     jugador.jugarRuleta();
                 break;
+            */
             case 4:
                 if (jugador.dinero <= 0) {
                     cout << "No tienes saldo suficiente. Deposita para jugar.\n";
@@ -868,8 +1120,10 @@ inline void iniciar(const string& nombreUsuario) {
             case 6:
                 if (jugador.dinero <= 0)
                     cout << "No tienes saldo suficiente. Deposita para jugar.\n";
-                else
-                    cout << "Craps aún no implementado.\n"; // Placeholder
+                else {
+                    jugador.jugarCraps();
+                }
+                    
                 break;
                 /*
             case 7:

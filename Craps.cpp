@@ -177,6 +177,36 @@ int validate()
 
 int gameplay(int maxAttempts = 0)
 {
+
+    // I declare the player's starting balance. I use 'static' so it keeps its value across games.
+    static int balance = 100;
+
+    // I use this variable to store the amount the player wants to bet.
+    int bet = 0;
+
+    // If the player has no money left, I end the game immediately.
+    if (balance <= 0)
+    {
+        cout << "You have no money left to bet. Game over.\n";
+        pause();
+        return 0;
+    }
+
+    // I show the player's current balance and ask for a bet within the allowed range.
+    cout << "Your current balance: $" << balance << endl;
+    cout << "Enter your bet (min $1, max $" << balance << "): ";
+    cin >> bet;
+
+    // I validate the input to make sure it's a number and within the allowed range.
+    while (cin.fail() || bet < 1 || bet > balance)
+    {
+        cin.clear();                 // I clear the error state if input failed
+        cin.ignore(1000, '\n');      // I discard the rest of the input buffer
+        cout << "Invalid bet. Enter a value between $1 and $" << balance << ": ";
+        cin >> bet;
+    }
+
+    balance -= bet;
     string newGame;
     srand(time(0));
 
