@@ -25,6 +25,206 @@ const int NORMAL = 2;
 const int MEDIO = 3;
 const int DIFICIL = 4;
 
+// Defino la cantidad de números que tiene la ruleta
+const int NUMEROS = 37;
+
+// Aquí pongo los números reales de la ruleta, en el orden que aparecen
+const int numeros[NUMEROS] = {
+    0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6,
+    27, 13, 36, 11, 30, 8, 23, 10, 5, 24,
+    16, 33, 1, 20, 14, 31, 9, 22, 18, 29,
+    7, 28, 12, 35, 3, 26
+};
+
+// Asigno el color correspondiente a cada número: 'R' rojo, 'N' negro, 'G' verde (solo el 0)
+const char colores[NUMEROS] = {
+    'G', 'N', 'R', 'N', 'R', 'N', 'R', 'N', 'R', 'N', 'R',
+    'N', 'R', 'N', 'R', 'N', 'R', 'N', 'R', 'N', 'R',
+    'N', 'R', 'N', 'R', 'N', 'R', 'N', 'R', 'N', 'R',
+    'N', 'R', 'N', 'R', 'N', 'R'
+};
+
+// Defino los códigos ANSI para cambiar el color del texto en consola
+const string rojo = "\033[31m";
+const string negro = "\033[30m";
+const string verde = "\033[32m";
+const string fondo_blanco = "\033[47m";
+const string reset = "\033[0m";
+
+// Estructura para guardar la posición X y Y de cada número en la ruleta visual
+struct Posicion { int x, y; };
+
+// Configuro las dimensiones y centro del "canvas" donde dibujaré la ruleta
+const int WIDTH = 90;
+const int HEIGHT = 30;
+const int RADIO = 13;
+const int CENTRO_X = WIDTH / 2;
+const int CENTRO_Y = HEIGHT / 2;
+
+// Array para guardar las posiciones calculadas de cada número
+Posicion posiciones[NUMEROS];
+
+// Aquí calculo la posición de cada número en forma circular para mostrar la ruleta
+void calcularPosiciones() {
+    for (int i = 0; i < NUMEROS; i++) {
+        double angulo = (2 * M_PI * i / NUMEROS) - M_PI / 2; // Distribuyo equitativamente en 360°
+        posiciones[i].x = CENTRO_X + int(RADIO * cos(angulo) * 1.9); // Ajusto factor X para visual mejor
+        posiciones[i].y = CENTRO_Y + int(RADIO * sin(angulo));
+    }
+}
+
+// Esta función dibuja la ruleta en consola, con los números y sus colores, y resalta uno iluminado
+void imprimirCanvas(int iluminado) {
+    string canvas[HEIGHT][WIDTH];
+    // Primero lleno todo con espacios para limpiar el canvas
+    for (int i = 0; i < HEIGHT; i++)
+        for (int j = 0; j < WIDTH; j++)
+            canvas[i][j] = " ";
+
+    // Pongo cada número en su posición con su color correspondiente
+    for (int i = 0; i < NUMEROS; i++) {
+        int x = posiciones[i].x;
+        int y = posiciones[i].y;
+        string color = (colores[i] == 'R') ? rojo : (colores[i] == 'N') ? negro : verde;
+
+        // Si es el número iluminado, lo resalto con fondo blanco
+        if (i == iluminado) color = fondo_blanco + color;
+
+        string numStr = (numeros[i] < 10 ? " " : "") + to_string(numeros[i]);
+
+        // Verifico que la posición esté dentro del canvas
+        if (x >= 0 && x + 1 < WIDTH && y >= 0 && y < HEIGHT) {
+            canvas[y][x] = color + numStr + reset;
+            canvas[y][x + 1] = ""; // Evito sobreescribir por error
+        }
+    }
+
+    // Dibujo puntos decorativos para darle un efecto de círculo
+    for (int r = 1; r < RADIO - 2; r++) {
+        for (int a = 0; a < 360; a += 15) {
+            double rad = a * M_PI / 180.0;
+            int x = CENTRO_X + int(r * cos(rad) * 0.5);
+            int y = CENTRO_Y + int(r * sin(rad));
+            if (x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT)
+                canvas[y][x] = ".";
+        }
+    }
+
+    // Marco el centro con una "O"
+    canvas[CENTRO_Y][CENTRO_X] = "O";
+
+    // Finalmente imprimo el canvas línea por línea
+    for (int i = 0; i < HEIGHT; i++) {
+        string linea = "";
+        for (int j = 0; j < WIDTH; j++) {
+            if (!canvas[i][j].empty()) linea += canvas[i][j];
+        }
+        cout << linea << "\n";
+    }
+}
+
+// Función para pasar a minúsculas una cadena (me sirve para validar entradas)
+string toLower(const string &s) {
+    string res = s;
+    transform(res.begin(), res.end(), res.begin(), ::tolower);
+    return res;
+}
+
+// Pido el tipo de apuesta (número, color o par/impar) y valido que sea una opción válida
+string pedirTipoApuesta() {
+    string tipo;
+    while (true) {
+        cout << "\n╔══════════════════════════════════════╗\n";
+        cout << "║         MENÚ DE APUESTAS             ║\n";
+        cout << "╠══════════════════════════════════════╣\n";
+        cout << "║  1. Número exacto      →  paga 35x   ║\n";
+        cout << "║  2. Color (Rojo/Negro) →  paga 2x    ║\n";
+        cout << "║  3. Par o Impar        →  paga 2x    ║\n";
+        cout << "╚══════════════════════════════════════╝\n";
+        cout << "→ Escoge una opción: ";
+        cin >> tipo;
+        tipo = toLower(tipo);
+
+        if (tipo == "1" || tipo == "2" || tipo == "3")
+            return tipo;
+        else
+            cout << "Opción inválida, intenta de nuevo.\n";
+    }
+}
+
+// Pido un número del 0 al 36 para la apuesta a número exacto
+int pedirNumero() {
+    int num;
+    while (true) {
+        cout << "Ingresa el número (0-36): ";
+        if (cin >> num) {
+            if (num >= 0 && num <= 36)
+                return num;
+            else
+                cout << "Número inválido. Debe estar entre 0 y 36.\n";
+        } else {
+            cout << "Entrada inválida. Ingresa un número entero.\n";
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
+    }
+}
+
+// Pido el color (Rojo o Negro), convierto a mayúsculas y valido que sea correcto
+char pedirColor() {
+    string color;
+    while (true) {
+        cout << "Ingresa el color (Rojo / Negro): ";
+        cin >> color;
+        color = toLower(color);
+        if (color == "rojo")
+            return 'R';
+        else if (color == "negro")
+            return 'N';
+        else
+            cout << "Color inválido. Solo 'Rojo' o 'Negro'.\n";
+    }
+}
+
+// Pido si apuesta a par o impar, valido la entrada
+char pedirParidad() {
+    string paridad;
+    while (true) {
+        cout << "¿Par o Impar?: ";
+        cin >> paridad;
+        paridad = toLower(paridad);
+        if (paridad == "par")
+            return 'P';
+        else if (paridad == "impar")
+            return 'I';
+        else
+            cout << "Opción inválida. Solo 'Par' o 'Impar'.\n";
+    }
+}
+
+// Pregunto si el jugador quiere seguir jugando, acepto respuestas variadas
+bool preguntarSeguir() {
+    string resp;
+    while (true) {
+        cout << "\n¿Querés seguir jugando? (sí / no): ";
+        cin >> resp;
+        resp = toLower(resp);
+        if (resp == "si" || resp == "sí") return true;
+        else if (resp == "no") return false;
+        else cout << "Respuesta inválida. Por favor, responde 'sí' o 'no'.\n";
+    }
+}
+
+// Según el sistema operativo defino cómo pausar o limpiar la consola
+#ifdef _WIN32
+void esperarMs(int ms) { Sleep(ms); }
+void limpiarConsola() { system("cls"); }
+#else
+void esperarMs(int ms) { usleep(ms * 1000); }
+void limpiarConsola() { cout << "\033[2J\033[H"; }
+#endif
+
+
 // ----------- Validación del nombre -----------//
 
 // Esta función valida que el nombre solo tenga letras y espacios
@@ -527,7 +727,7 @@ struct Jugador {
     // Cargar estadísticas del jugador desde el archivo
     cargarEstadisticasJugador();
     
-    cout << "\nEstadísticas de Blackjack:\n";
+    cout << "\nEstadísticas del jugador:\n";
     cout << "Partidas jugadas: " << partidasJugadas << "\n";
     cout << "Partidas ganadas: " << partidasGanadas << "\n";
     cout << "Partidas perdidas: " << partidasPerdidas << "\n";
@@ -579,6 +779,135 @@ struct Jugador {
     }
 
     // ----------- Lógica de la Ruleta ----------- //
+
+     void jugarRuleta() {
+        calcularPosiciones(); // Calculo las posiciones de la ruleta
+        while (dinero > 0) {
+    // Verifico si tengo dinero para jugar.
+    if (dinero <= 0) {
+        cout << "No tienes dinero para jugar Blackjack.\n";
+        return;
+    }
+    int apuesta;
+    cout << "Tu dinero actual es $" << dinero << ". Ingresa tu apuesta (mínimo $10, máximo $500): $";
+    
+    while (true) {
+        cin >> apuesta;
+        // Verifico si la apuesta es válida.
+        if (cin.fail() || apuesta < 10 || apuesta > 500 || apuesta > dinero) {
+            cin.clear(); 
+            cin.ignore(1000, '\n');
+            cout << "Apuesta inválida. Debe ser entre $10 y $500 y no puede exceder tu saldo actual.\n";
+            cout << "Tu dinero actual es $" << dinero << ". Ingresa tu apuesta: $";
+            continue;
+        }
+        
+        // Acepto la apuesta válida
+        break;
+    }
+
+            // Pido qué tipo de apuesta quiere hacer
+            string tipo = pedirTipoApuesta();
+
+            int eleccion = -1;
+            string resumen;
+            char colorElegido = 0;
+            char paridadElegida = 0;
+
+            // Según el tipo pido más datos y armo un resumen para mostrar después
+            if (tipo == "1") {
+                eleccion = pedirNumero();
+                resumen = "Apuesta: al número " + to_string(eleccion);
+            } else if (tipo == "2") {
+                colorElegido = pedirColor();
+                resumen = "Apuesta: al color " + string((colorElegido == 'R') ? "Rojo" : "Negro") + " | Monto: $" + to_string(apuesta);
+            } else { // tipo == "3"
+                paridadElegida = pedirParidad();
+                resumen = "Apuesta: a " + string((paridadElegida == 'P') ? "par" : "impar") + " | Monto: $" + to_string(apuesta);
+            }
+
+            cout << "\n" << resumen << "\nGirando la ruleta...\n";
+
+            // Genero un número ganador aleatorio y simulo el giro con un efecto de desaceleración
+            int ganador = rand() % NUMEROS;
+            int vueltas = 3;
+            int totalPasos = vueltas * NUMEROS + ganador;
+            int iluminado = 0;
+
+            for (int paso = 0; paso <= totalPasos; paso++) {
+                limpiarConsola();
+                cout << "\nSaldo actual: $" << dinero << "\n";
+                cout << resumen << "\n";
+                imprimirCanvas(iluminado);
+                iluminado = (iluminado + 1) % NUMEROS;
+
+                // Aquí hago que la animación desacelere conforme se acerca al número ganador
+                if (paso > totalPasos - 10) esperarMs(200);
+                else if (paso > totalPasos - 20) esperarMs(150);
+                else esperarMs(60);
+            }
+
+            int numGanador = numeros[ganador];
+            char colorGanador = colores[ganador];
+
+            cout << "\nLa ruleta cayó en el número " << numGanador << " (";
+            cout << (colorGanador == 'R' ? "Rojo" : colorGanador == 'N' ? "Negro" : "Verde") << ")\n";
+
+            bool gano = false;
+             // Evaluo si la apuesta fue ganadora
+        if (tipo == "1" && numGanador == eleccion) {
+            cout << "¡Ganaste 35 veces tu apuesta!\n";
+            dinero += apuesta * 35;
+            partidasGanadas++;
+            gano = true;
+        } else if (tipo == "2" && colorGanador == colorElegido) {
+            cout << "¡Ganaste 2 veces tu apuesta!\n";
+            dinero += apuesta * 2;
+            partidasGanadas++;
+            gano = true;
+        } else if (tipo == "3") {
+            // Para par o impar, el 0 no cuenta como ganador
+            if (numGanador != 0) {
+                if ((paridadElegida == 'P' && numGanador % 2 == 0) ||
+                    (paridadElegida == 'I' && numGanador % 2 != 0)) {
+                    cout << "¡Ganaste 2 veces tu apuesta!\n";
+                    dinero += apuesta * 2;
+                    partidasGanadas++;
+                    gano = true;
+                }
+            }
+        }
+
+        if (!gano) {
+            cout << "No ganaste esta vez.\n";
+            dinero -= apuesta;
+            partidasPerdidas++;
+        }
+
+            if (!gano) {
+                cout << "No ganaste esta vez.\n";
+                dinero -= apuesta;
+            }
+
+            cout << "\nSaldo actualizado: $" << dinero << "\n";
+
+              // Guardar saldo y estadísticas después de cada jugada
+                guardarSaldo(nombre, dinero);
+                actualizarEstadisticas();
+                
+            // Pregunto si quiere seguir jugando, validando que la respuesta sea correcta
+            if (!preguntarSeguir()) break;
+        }
+
+        if (dinero <= 0) {
+        cout << "\nTe has quedado sin dinero. Juego terminado.\n";
+        // Asegurar guardado final del saldo y estadísticas
+        guardarSaldo(nombre, dinero);
+        actualizarEstadisticas();
+        }
+
+        cout << "\nGracias por jugar. Tu saldo final fue: $" << dinero << "\n";
+    }
 
     // ----------- Lógica del Blackjack ----------- //
 
@@ -788,6 +1117,9 @@ void jugarBlackjack() {
     // Actualizo las estadísticas en el archivo
     actualizarEstadisticas();
 }
+
+//----------- Lógica del Craps ----------- //
+
 
  //----------- Lógica del Craps ----------- //
 
@@ -1096,14 +1428,12 @@ inline void iniciar(const string& nombreUsuario) {
                 jugador.retirar(cantidad);
                 break;
             }
-            /*
             case 3:
                 if (jugador.dinero <= 0)
                     cout << "No tienes saldo suficiente. Deposita para jugar.\n";
                 else
                      jugador.jugarRuleta();
                 break;
-            */
             case 4:
                 if (jugador.dinero <= 0) {
                     cout << "No tienes saldo suficiente. Deposita para jugar.\n";

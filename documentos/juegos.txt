@@ -24,3 +24,6 @@ Jugador: alonso | Evento: Craps | Cantidad: $10 | Resultado: Perdió | Dinero re
 Jugador: alonso | Evento: Craps | Cantidad: $10 | Resultado: Perdió | Dinero restante: $174
 Jugador: alonso | Evento: Craps | Cantidad: $40 | Resultado: Perdió | Dinero restante: $134
 Jugador: alonso | Evento: Blackjack | Cantidad: $15 | Resultado: Perdió | Dinero restante: $119
+Jugador: alonso | Evento: Ruleta | Cantidad: $40 | Resultado: Perdió | Dinero restante: $79
+Jugador: alonso | Evento: Blackjack | Cantidad: $10 | Resultado: Perdió | Dinero restante: $89
+Jugador: alonso | Evento: Craps | Cantidad: $10 | Resultado: Ganó | Dinero restante: $99
