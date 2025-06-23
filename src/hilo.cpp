@@ -97,7 +97,21 @@ void hilo(int& bet, int& balance){
                 keep = false;
             }
             
-        }else
+        }else if (card == card2)
+        {
+            cout << "It was a tie \n";
+            cout << "No one loses, no one wins \n";
+            cout << "Do you want to keep playing? (Y/N)";
+            cin >> going;
+            if (going == 'N' || going == 'n')
+            {
+                balance = balance + bet;
+                cout <<"Thanks for playing" << endl;
+                keep = false;
+            }
+        }
+        
+        else
         {
             cout << "Wrong!!! you lost your bet \n";
             bet = 0;
