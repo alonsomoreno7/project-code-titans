@@ -1,5 +1,7 @@
 #include <iostream>
-#include <cstring>
+#include <cstring>     //libreria para manejar texto tipo string
+#include <cstdlib>     //Para usar rand() 
+#include <ctime>       // Para usar time() como semilla aleatoria
 using namespace std;
 
 //funcion para cambiar el texto de color
@@ -43,9 +45,9 @@ void showSlotmenu()
     cout << "|                                                          . " << endl;
     cout << "*                  Choose the difficulty:                  . " << endl;
     cout << "|                                                          . " << endl;
-    cout << ".   (E) EASY:      3 lines                                 | " << endl;
-    cout << ".   (M) MEDIUM:    4 lines                                 * " << endl;
-    cout << ".   (H) HARD:      5 lines                                 | " << endl;
+    cout << ".   (E) EASY:      3 lines (Bet: $100, Win: $300)          | " << endl;
+    cout << ".   (M) MEDIUM:    4 lines (Bet: $200, Win: $800)          * " << endl;
+    cout << ".   (H) HARD:      5 lines (Bet: $100, Win: $1500)         | " << endl;
     cout << ".                                                          * " << endl;
     cout << ".     BACK (B)                                             | " << endl;
     cout << ". . . . . . . . . . . . . .* - * - * - * - * - * - * - * - * " << endl;
@@ -119,7 +121,7 @@ char randomSymbolE (){
     //Funcion para generar simbolos aleatorios
 
     char symbol [3]= {'@','$','7'}; //arreglo con 3 simbolos
-    int randomP = rand()%3; //variable para elegir un numero del 0 al 3
+    int randomP = rand()%3; //variable para elegir un numero entre 0 y 2
     return symbol[randomP]; //la funcion retornara un simbolo random
 }
 
@@ -224,28 +226,30 @@ void easyMode(){
     
                 if(pull=="!"){
                     //si se ingresa "!" se continua con el juego.
-                    for(int i=0;i<=3;i++){            //
-                        symbols[i]= randomSymbolE();
+                    for(int i=0;i<3;i++){            //recorrer el arreglo
+                        symbols[i]= randomSymbolE(); //guardar cada simbolo aleatorio obtenido
                     }
                     finalSlotsE(symbols); //Se llama a la funcion Mostrar slots finales al jugador
                 
-                    if(jackpotE(symbols)){
+                    if(jackpotE(symbols)){ //llama a la funcion comprobar si todos los simbolos son iguales
+                        //Si es true el jugador gano
                         setColor(32); //color verde
                         cout<<"            * JACKPOT!! *   "<<endl;
                         resetColor();
                         cout<<endl;
-                        cout<<" Congratulations!! you have earned: $x"<<endl;
+                        cout<<" Congratulations!! you have earned: $300"<<endl; //muestra dinero obtenido por el jugador
                         cout<<endl;
-                        i=0;
-                        playerLose=0;
-                        break;
+                        i=0; //i toma el valor de 0 para finalizar el bucle for inicial
+                        playerLose=0; //variable toma el valor de 0 para verificar que el jugador ha ganado
+                        break; //el juego termina al i=0
                     }else{
+                        //Si es false el jugador perdio
                         setColor(36); //color cian
                         cout<<"            KEEP TRYING "<<endl;
                         resetColor();
                         losePhrases();
-                        playerLose=1;
-                        break;
+                        playerLose=1; //variable toma el valor de 0 para verificar que el jugador ha perdido
+                        break; //el jugador continuara con sus tiradas restantes
                     
                     }
                 
@@ -263,10 +267,10 @@ void easyMode(){
 
         }
 
-        if(playerLose==1){
+        if(playerLose==1){ //si variable es igual a 1 el jugador perdio
             cout<<endl;
-            cout<<"   You'll be lucky next time."<<endl;
-            cout<<"-$100"<<endl;
+            cout<<"   You'll be lucky next time."<<endl; //mensaje motivacional
+            cout<<"-$100"<<endl; //cantidad que el jugador perdio
             cout<<endl;
         }
 
@@ -326,7 +330,7 @@ void emptySlotsM(){
 char randomSymbolM (){
     //Funcion para generar simbolos aleatorios
     char symbol [3]= {'$','7','0'}; //arreglo con 3 simbolos
-    int randomP = rand()%3; //variable para elegir un numero del 0 al 4
+    int randomP = rand()%3; //variable para elegir un numero entre 0 y 2
     return symbol[randomP]; //la funcion retornara un simbolo random
 }
 
@@ -428,28 +432,30 @@ void mediumMode(){
     
                 if(pull=="!"){
                     //si se ingresa "!" se continua con el juego.
-                    for(int i=0;i<=4;i++){            //
-                        symbols[i]= randomSymbolM();
+                    for(int i=0;i<4;i++){            //recorrer el arreglo
+                        symbols[i]= randomSymbolE(); //guardar cada simbolo aleatorio obtenido
                     }
-                    finalSlotsM(symbols); //Se llama a la funcion Mostrar slots finales al jugador
+                    finalSlotsE(symbols); //Se llama a la funcion Mostrar slots finales al jugador
                 
-                    if(jackpotM(symbols)){
+                    if(jackpotE(symbols)){ //llama a la funcion comprobar si todos los simbolos son iguales
+                        //Si es true el jugador gano
                         setColor(32); //color verde
-                        cout<<"               * JACKPOT!! *   "<<endl;
+                        cout<<"            * JACKPOT!! *   "<<endl;
                         resetColor();
                         cout<<endl;
-                        cout<<" Congratulations!! you have earned: $x"<<endl;
+                        cout<<" Congratulations!! you have earned: $800"<<endl; //muestra dinero obtenido por el jugador
                         cout<<endl;
-                        i=0;
-                        playerLose=0;
-                        break;
+                        i=0; //i toma el valor de 0 para finalizar el bucle for inicial
+                        playerLose=0; //variable toma el valor de 0 para verificar que el jugador ha ganado
+                        break; //el juego termina al i=0
                     }else{
+                        //Si es false el jugador perdio
                         setColor(36); //color cian
-                        cout<<"               KEEP TRYING "<<endl;
+                        cout<<"            KEEP TRYING "<<endl;
                         resetColor();
                         losePhrases();
-                        playerLose=1;
-                        break;
+                        playerLose=1; //variable toma el valor de 0 para verificar que el jugador ha perdido
+                        break; //el jugador continuara con sus tiradas restantes
                     }
                 
                 }else{
@@ -466,7 +472,7 @@ void mediumMode(){
         if(playerLose==1){
             cout<<endl;
             cout<<"   You'll be lucky next time."<<endl;
-            cout<<"-$100"<<endl;
+            cout<<"-$200"<<endl;
             cout<<endl;
         }
 
@@ -524,7 +530,7 @@ void emptySlotsH(){
 char randomSymbolH (){
     //Funcion para generar simbolos aleatorios
     char symbol [3]= {'$','7','@'}; //arreglo con 4 simbolos
-    int randomP = rand()%3; //variable para elegir un numero del 0 al 4
+    int randomP = rand()%3; //variable para elegir un numero entre 0 y 2
     return symbol[randomP]; //la funcion retornara un simbolo random
 }
 
@@ -629,30 +635,33 @@ void hardMode(){
                 getline(cin,pull); //el jugador debe ingresar "!" y se lee el character ingresado
     
                 if(pull=="!"){
-                    //si se ingresa "!" se continua con el juego.
-                    for(int i=0;i<=5;i++){            //
-                        symbols[i]= randomSymbolH();
+                   //si se ingresa "!" se continua con el juego.
+                    for(int i=0;i<3;i++){            //recorrer el arreglo
+                        symbols[i]= randomSymbolE(); //guardar cada simbolo aleatorio obtenido
                     }
-                    finalSlotsH(symbols); //Se llama a la funcion Mostrar slots finales al jugador
-                
-                    if(jackpotH(symbols)){
-                        setColor(32); //color verde
-                        cout<<"                   * JACKPOT!! *   "<<endl;
-                        resetColor();
-                        cout<<endl;
-                        cout<<" Congratulations!! you have earned: $x"<<endl;
-                        cout<<endl;
-                        i=0;
-                        playerLose=0;
-                        break;
+                    finalSlotsE(symbols); //Se llama a la funcion Mostrar slots finales al jugador
+            
+                    if(jackpotE(symbols)){ //llama a la funcion comprobar si todos los simbolos son iguales
+                    //Si es true el jugador gano
+                    setColor(32); //color verde
+                    cout<<"            * JACKPOT!! *   "<<endl;
+                    resetColor();
+                    cout<<endl;
+                    cout<<" Congratulations!! you have earned: $1500"<<endl; //muestra dinero obtenido por el jugador
+                    cout<<endl;
+                    i=0; //i toma el valor de 0 para finalizar el bucle for inicial
+                    playerLose=0; //variable toma el valor de 0 para verificar que el jugador ha ganado
+                    break; //el juego termina al i=0
+
                     }else{
-                        setColor(36); //color cian
-                        cout<<"                   KEEP TRYING "<<endl;
-                        resetColor();
-                        losePhrases();
-                        playerLose=1;
-                        break;
-                    }
+                    //Si es false el jugador perdio
+                    setColor(36); //color cian
+                    cout<<"            KEEP TRYING "<<endl;
+                    resetColor();
+                    losePhrases();
+                    playerLose=1; //variable toma el valor de 0 para verificar que el jugador ha perdido
+                    break; //el jugador continuara con sus tiradas restantes
+                }
                 
                 }else{
                     cout<<endl;
@@ -668,7 +677,7 @@ void hardMode(){
         if(playerLose==1){
             cout<<endl;
             cout<<"   You'll be lucky next time."<<endl;
-            cout<<"-$100"<<endl;
+            cout<<"-$300"<<endl;
             cout<<endl;
         }
 
