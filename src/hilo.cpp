@@ -4,7 +4,7 @@
 #include <ctime>
 #include <cstdlib>
 #include <fstream> 
-#include "hilo.h"
+
 
 using namespace std;
 
@@ -72,9 +72,15 @@ void hilo(int& bet, int& balance){
         string suit2 = RandomSuit();
 
         //the player try to guess 
-        cout << "The next card will be Higher (H) or Lower (L) \n";
-        cin >> guess;
+        while (true) {
+            cout << "The next card will be Higher (H) or Lower (L): ";
+            cin >> guess;
+            if (guess == 'H' || guess == 'h' || guess == 'L' || guess == 'l') break;
+            cout << "Invalid option, please select 'H' or 'L'\n";
+        }
+
         //show the next card
+        cout << "---------------------------------------------------\n";
         cout << "The next card is: \n";
         int values2[] = {card2};
         string suits2[] = {suit2};
@@ -88,8 +94,14 @@ void hilo(int& bet, int& balance){
             card = card2;
             bet = bet * 2;
             cout << "Congratulations you win this round \n";
-            cout << "Do you want to keep playing? (Y/N)";
-            cin >> going;
+            //make sure that the player select Y or N
+            while (true) {
+                        cout << "Do you want to keep playing ";
+                        cin >> going;
+                        if (going == 'Y' || going == 'y' || going == 'N' || going == 'n') break;
+                        cout << "Invalid option, please select 'Y' or 'N'\n";
+            }
+            //Return to de HILO menu
             if (going == 'N' || going == 'n')
             {
                 balance = balance + bet;
@@ -101,8 +113,14 @@ void hilo(int& bet, int& balance){
         {
             cout << "It was a tie \n";
             cout << "No one loses, no one wins \n";
-            cout << "Do you want to keep playing? (Y/N)";
-            cin >> going;
+            //make sure that the player select Y or N
+            while (true) {
+                        cout << "Do you want to keep playing ";
+                        cin >> going;
+                        if (going == 'Y' || going == 'y' || going == 'N' || going == 'n') break;
+                        cout << "Invalid option, please select 'Y' or 'N'\n";
+            }
+            //Return to de HILO menu
             if (going == 'N' || going == 'n')
             {
                 balance = balance + bet;
@@ -110,7 +128,7 @@ void hilo(int& bet, int& balance){
                 keep = false;
             }
         }
-        
+        // lose the bet and return to the HILO menu
         else
         {
             cout << "Wrong!!! you lost your bet \n";
@@ -124,6 +142,7 @@ void hilo(int& bet, int& balance){
     
 }
 
+//Confirm if the bet its valid
 void BetConfirm(int& bet, int& balance) {
     cout << "How much will your bet be? \n";
 
