@@ -1,16 +1,17 @@
 #ifndef JUGADOR_H
 #define JUGADOR_H
 
-#include <string>
-#include <fstream>
-#include <cmath>
-#include <iostream>
-#include <cctype>
-#include <cstdlib>   // Para usar rand()
-#include <ctime>     // Para usar time() y así inicializar rand()
-#include <limits>    // Para limpiar buffer con cin.ignore()
-#include <windows.h>
-#include <algorithm>
+// Incluyo las librerías necesarias para el funcionamiento del código:
+#include <string>      // Para manejar texto (strings)
+#include <fstream>     // Para trabajar con archivos (leer/escribir)
+#include <cmath>       // Para operaciones matemáticas (como cos, sin, M_PI)
+#include <iostream>    // Para entrada/salida estándar (cout, cin)
+#include <cctype>      // Para funciones de caracteres (isalpha, tolower)
+#include <cstdlib>     // Para rand() y system()
+#include <ctime>       // Para time() (semilla de números aleatorios)
+#include <limits>      // Para limpiar buffers de entrada (numeric_limits)
+#include <windows.h>   // Para Sleep() en Windows (solo se incluye en Windows)
+#include <algorithm>   // Para transform() y otras operaciones con contenedores
 /*
 #include "hilo.h"
 */
