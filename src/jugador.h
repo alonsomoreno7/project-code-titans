@@ -671,22 +671,42 @@ void guardarEstadisticas(const string& nombre, int jugadas, int ganadas, int per
 }
 
 bool cargarEstadisticas(const string& nombre, int& jugadas, int& ganadas, int& perdidas, int& empatadas) {
+    // Primero intento abrir el archivo que contiene las estadísticas del jugador
     ifstream archivo("./documentos/estadisticas_" + nombre + ".txt");
+
+    // Si no se puede abrir el archivo, devuelvo false para indicar el error
     if (!archivo.is_open()) return false;
 
-    string linea;
-    while (getline(archivo, linea)) {
-        if (linea.find("Partidas jugadas:") != string::npos) {
-            jugadas = stoi(linea.substr(linea.find(":") + 2));
-        } else if (linea.find("Partidas ganadas:") != string::npos) {
-            ganadas = stoi(linea.substr(linea.find(":") + 2));
-        } else if (linea.find("Partidas perdidas:") != string::npos) {
-            perdidas = stoi(linea.substr(linea.find(":") + 2));
-        } else if (linea.find("Partidas empatadas:") != string::npos) {
-            empatadas = stoi(linea.substr(linea.find(":") + 2));
+    string clave;
+    int valor;
+
+    // Empiezo a leer línea por línea, separando la clave y el valor usando ':' como delimitador
+    while (archivo >> ws && getline(archivo, clave, ':')) {
+        archivo >> ws; // Elimino espacios innecesarios antes del valor
+
+        // Verifico que el valor sea un número válido
+        if (!(archivo >> valor)) {
+            archivo.clear(); // Limpio cualquier estado de error del archivo
+            archivo.ignore(numeric_limits<streamsize>::max(), '\n'); // Me salto la línea si está mal escrita
+            continue; // Paso a la siguiente línea
+        }
+
+        // Comparo la clave leída para saber a qué estadística corresponde el valor
+        if (clave == "Partidas jugadas") {
+            jugadas = valor; // Asigno el valor a la variable de jugadas
+        } else if (clave == "Partidas ganadas") {
+            ganadas = valor; // Asigno el valor a la variable de ganadas
+        } else if (clave == "Partidas perdidas") {
+            perdidas = valor; // Asigno el valor a la variable de perdidas
+        } else if (clave == "Partidas empatadas") {
+            empatadas = valor; // Asigno el valor a la variable de empatadas
         }
     }
+
+    // Cierro el archivo al finalizar la lectura
     archivo.close();
+
+    // Devuelvo true porque todo salió bien
     return true;
 }
 
@@ -805,6 +825,7 @@ struct Jugador {
         // Acepto la apuesta válida
         break;
     }
+    partidasJugadas++; // Incremento el total de partidas jugadas
 
             // Pido qué tipo de apuesta quiere hacer
             string tipo = pedirTipoApuesta();
@@ -878,16 +899,11 @@ struct Jugador {
             }
         }
 
-        if (!gano) {
-            cout << "No ganaste esta vez.\n";
-            dinero -= apuesta;
-            partidasPerdidas++;
-        }
-
-            if (!gano) {
-                cout << "No ganaste esta vez.\n";
-                dinero -= apuesta;
-            }
+   if (!gano) {
+    cout << "No ganaste esta vez.\n";
+    dinero -= apuesta;
+    partidasPerdidas++;
+    }
 
             cout << "\nSaldo actualizado: $" << dinero << "\n";
 
@@ -1010,18 +1026,36 @@ void jugarBlackjack() {
 
     // Elijo el nivel de dificultad.
     int nivelDificultad;
-    cout << "Selecciona el nivel de dificultad:\n";
-    cout << "1. Normal (2 cartas)\n";
-    cout << "2. Medio (3 cartas)\n";
-    cout << "3. Difícil (4 cartas)\n";
+   // Bucle para asegurarme de que el jugador elija una dificultad válida
+while (true) {
+    cout << "======================================\n";
+    cout << "     Selecciona el nivel de dificultad\n";
+    cout << "--------------------------------------\n";
+    cout << "  1. Normal  (2 cartas)\n";
+    cout << "  2. Medio   (3 cartas)\n";
+    cout << "  3. Difícil (4 cartas)\n";
+    cout << "======================================\n";
     cout << "Opción: ";
+    
     cin >> nivelDificultad;
 
-    // Valido la opción de dificultad.
-    if (nivelDificultad < 1 || nivelDificultad > 3) {
-        cout << "Opción inválida. Se seleccionará Normal por defecto.\n";
-        nivelDificultad = 1; // Por defecto a Normal
+    // Verifico si la entrada fue numérica y está entre 1 y 3
+    if (!cin.fail() && nivelDificultad >= 1 && nivelDificultad <= 3) {
+        limpiarConsola();
+        cout << "Has seleccionado el nivel ";
+        if (nivelDificultad == 1) cout << "Normal.\n";
+        else if (nivelDificultad == 2) cout << "Medio.\n";
+        else cout << "Difícil.\n";
+        break;
     }
+
+    // Si la entrada fue inválida, la limpio y muestro el error
+    cin.clear(); // Limpio el error de cin
+    cin.ignore(1000, '\n'); // Descarto el resto de la línea
+    limpiarConsola();
+    cout << "Entrada inválida. Por favor ingresa un número del 1 al 3.\n\n";
+}
+
 
     // Determino la cantidad de cartas según la dificultad seleccionada.
     int cartasIniciales = NORMAL + (nivelDificultad - 1); // Normal = 2, Medio = 3, Difícil = 4
