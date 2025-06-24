@@ -124,24 +124,36 @@ void hilo(int& bet, int& balance){
     
 }
 
-//verify if the bet its possible
-void BetConfirm(int& bet, int& balance)
-{
+void BetConfirm(int& bet, int& balance) {
     cout << "How much will your bet be? \n";
-    cin >> bet;
-    if (bet <= 0)
-    {
-    cout << "Your bet must be higher than 0 \n";
-    }else if (bet > balance)
-    {
-        cout << "Your bet is higher than your balance \n";
-    }else
-    {
-      //if the bet is valid, start game and the bet is subtracted from the balance
-        balance = balance - bet;
-        hilo(bet, balance);
+
+    while (true) {
+        cin >> bet;
+
+        if (cin.fail()) {
+            cin.clear();
+            cin.ignore(1000, '\n');
+            cout << "Your bet is invalid, try entering a number\n";
+        }
+        else if (bet <= 0) {
+            cout << "Your bet must be higher than 0\n";
+        }
+        else if (bet > balance) {
+            cout << "Your bet is higher than your balance\n";
+            cout <<"Your balance is: " << balance << endl;
+        }
+        else {
+            //If the bet its valid:
+            balance = balance - bet;
+            hilo(bet, balance);
+            break;
+        }
+
+        // Ask for a bet again
+        cout << "Please enter a valid bet: $";
     }
 }
+
 
 //HI-LO game main menu
 void PlayHilo(int& balance){
@@ -152,6 +164,7 @@ void PlayHilo(int& balance){
 
     do
     {
+        //main menu
         cout << "---- Welcome to HI-LO game ----\n";
         cout << "1. Game explanation \n";
         cout << "2. Play \n";
