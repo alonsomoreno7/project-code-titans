@@ -234,7 +234,7 @@ bool preguntarSeguir() {
 }
 int main() {
     srand(time(nullptr)); // Inicio la semilla aleatoria para que los números cambien
-    calcularPosiciones();  // Calculo donde debo colorcar los numeros en la ruleta
+    calcularPosiciones();  // Calculo dónde se deben colocar los números en la ruleta visual
 
     int saldo = 1000; // Inicio con 1000 de saldo para apostar
 
@@ -266,11 +266,72 @@ int main() {
         }
 
         cout << "\n" << resumen << "\nGirando la ruleta...\n";
-        
-        
 
-       
+        // Genero un número ganador aleatorio y simulo el giro con un efecto de desaceleración
+        int ganador = rand() % NUMEROS;
+        int vueltas = 3;
+        int totalPasos = vueltas * NUMEROS + ganador;
+        int iluminado = 0;
+
+        for (int paso = 0; paso <= totalPasos; paso++) {
+            limpiarConsola();
+            cout << "\nSaldo actual: $" << saldo << "\n";
+            cout << resumen << "\n";
+            imprimirCanvas(iluminado);
+            iluminado = (iluminado + 1) % NUMEROS;
+
+            // Aquí hago que la animación desacelere conforme se acerca al número ganador
+            if (paso > totalPasos - 10) esperarMs(200);
+            else if (paso > totalPasos - 20) esperarMs(150);
+            else esperarMs(60);
+        }
+
+        int numGanador = numeros[ganador];
+        char colorGanador = colores[ganador];
+
+        cout << "\nLa ruleta cayó en el número " << numGanador << " (";
+        cout << (colorGanador == 'R' ? "Rojo" : colorGanador == 'N' ? "Negro" : "Verde") << ")\n";
+
+        bool gano = false;
+        // Evaluo si la apuesta fue ganadora
+        if (tipo == "1" && numGanador == eleccion)
+        bool gano = false;
+        // Evaluo si la apuesta fue ganadora
+        if (tipo == "1" && numGanador == eleccion) {
+            cout << "¡Ganaste 35 veces tu apuesta!\n";
+            saldo += apuesta * 35;
+            gano = true;
+        } else if (tipo == "2" && colorGanador == colorElegido) {
+            cout << "¡Ganaste 2 veces tu apuesta!\n";
+            saldo += apuesta * 2;
+            gano = true;
+        } else if (tipo == "3") {
+            // Para par o impar, el 0 no cuenta como ganador
+            if (numGanador != 0) {
+                if ((paridadElegida == 'P' && numGanador % 2 == 0) ||
+                    (paridadElegida == 'I' && numGanador % 2 != 0)) {
+                    cout << "¡Ganaste 2 veces tu apuesta!\n";
+                    saldo += apuesta * 2;
+                    gano = true;
+                }
+            }
+        }
+
+        if (!gano) {
+            cout << "No ganaste esta vez.\n";
+            saldo -= apuesta;
+        }
+
+        cout << "\nSaldo actualizado: $" << saldo << "\n";
+
+        // Pregunto si quiere seguir jugando, validando que la respuesta sea correcta
+        if (!preguntarSeguir()) break;
     }
+
+    if (saldo <= 0)
+        cout << "\nTe has quedado sin dinero. Juego terminado.\n";
+
+    cout << "\nGracias por jugar. Tu saldo final fue: $" << saldo << "\n";
 
     return 0;
 }
