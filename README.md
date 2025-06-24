@@ -10,7 +10,7 @@ El juego simula un casino digital completamente jugable desde la consola. Ofrece
 El jugador inicia con un monto fijo de dinero y puede apostar en distintos juegos clásicos del casino. Según el resultado de cada partida, gana o pierde dinero. Todo se gestiona mediante menús interactivos en consola.
 
 # Idea general de la jugabilidad
-Comienzas con una cantidad inicial (ej. $1000).
+El jugador puede realizar depósitos para añadir saldo a su cuenta.
 
 Eliges entre 4 juegos disponibles.
 

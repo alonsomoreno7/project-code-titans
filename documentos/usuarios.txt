@@ -12,3 +12,15 @@ Contraseña: 321
 Código: 499824
 =================
 
+=== Usuario ===
+Nombre: manuel
+Contraseña: 123456789
+Código: 025782
+=================
+
+=== Usuario ===
+Nombre: sofia
+Contraseña: 1234
+Código: 332250
+=================
+

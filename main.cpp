@@ -5,7 +5,7 @@
 int main() {
     SetConsoleOutputCP(CP_UTF8);
     // Esta es la única función que llamo desde el main, porque en jugador.h ya controlo todo el flujo del casino.
-    menuInicio();
+    menuModoJuego();
     return 0;
 }
 
