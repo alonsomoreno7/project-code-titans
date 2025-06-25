@@ -1,7 +1,0 @@
-Jugador: alonso | Evento: Depósito | Cantidad: $400 | Dinero restante: $400
-Jugador: carlos | Evento: Depósito | Cantidad: $50 | Dinero restante: $50
-Jugador: alonso | Evento: Depósito | Cantidad: $400 | Dinero restante: $499
-Jugador: manuel | Evento: Depósito | Cantidad: $10 | Dinero restante: $10
-Jugador: manuel | Evento: Depósito | Cantidad: $1000000 | Dinero restante: $999990
-Jugador: sofia | Evento: Depósito | Cantidad: $400 | Dinero restante: $400
-Jugador: sofia | Evento: Depósito | Cantidad: $400 | Dinero restante: $400
