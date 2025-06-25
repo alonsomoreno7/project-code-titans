@@ -1,0 +1,9 @@
+====== Usuario ======
+Nombre: alonso
+Contraseña: 12345678
+Código: 174094
+Nacimiento: 24/06/2006
+Género: m
+DUI: 12345678-9
+=================
+
